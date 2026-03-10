@@ -1,36 +1,2732 @@
-<!DOCTYPE html>
-<html>
+!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch OS - 時計物販管理システム</title>
+    <style>
+        :root {
+            --primary-color: #3b6fd4;
+            --secondary-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-bg: #1a2b4a;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255,255,255,0.1);
+            --card-bg-solid: rgba(255,255,255,0.95);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* ============= SIDEBAR ============= */
+        .sidebar {
+            width: 260px;
+            background: rgba(26, 43, 74, 0.95);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar.collapsed {
+            width: 75px;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar.collapsed .sidebar-title .title-text {
+            display: none;
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 0;
+        }
+        
+        .menu-item:hover,
+        .menu-item.active {
+            background: linear-gradient(90deg, transparent, rgba(59, 111, 212, 0.4));
+            color: white;
+            border-right: 4px solid var(--warning-color);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(90deg, transparent, rgba(59, 111, 212, 0.6));
+            font-weight: 600;
+        }
+        
+        .sidebar.collapsed .menu-item .menu-text {
+            display: none;
+        }
+        
+        .toggle-btn {
+            position: absolute;
+            top: 25px;
+            right: -18px;
+            width: 36px;
+            height: 36px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+        
+        /* ============= MAIN CONTENT ============= */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .main-content.expanded {
+            margin-left: 75px;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ============= HEADER ============= */
+        .page-header {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .page-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .page-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1rem;
+        }
+        
+        /* ============= DASHBOARD ============= */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .dashboard-card {
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-icon {
+            font-size: 1.4rem;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--warning-color);
+            margin-bottom: 8px;
+        }
+        
+        .card-subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        .card-trend {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        /* ============= KPI PAGE ============= */
+        .kpi-container {
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .kpi-header {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .kpi-card {
+            background: var(--card-bg-solid);
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .kpi-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-target {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+        
+        .progress-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 8px;
+        }
+        
+        /* ============= INVENTORY TABLE ============= */
+        .inventory-container {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .inventory-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.offline {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .add-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .add-button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 14px 14px 48px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.95);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 1.2rem;
+        }
+        
+        .table-container {
+            background: var(--card-bg-solid);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .table-wrapper {
+            overflow: auto;
+            max-height: 70vh;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            min-width: 1600px;
+        }
+        
+        thead tr {
+            background: linear-gradient(135deg, #3b6fd4, #6366f1);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        th {
+            padding: 16px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        
+        .sortable-header:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sort-indicator {
+            margin-left: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .watch-id-header, .days-header {
+            background: var(--warning-color) !important;
+            width: 85px;
+        }
+        
+        .profit-header {
+            background: var(--success-color) !important;
+            width: 85px;
+        }
+        
+        .brand-header { width: 80px; }
+        .model-header { width: 100px; }
+        .condition-header { width: 75px; }
+        .url-header { width: 90px; }
+        .date-header { width: 105px; }
+        .price-header { width: 85px; }
+        .shipping-header { width: 95px; }
+        .cost-header { width: 75px; }
+        .destination-header { width: 75px; }
+        .status-header { width: 85px; }
+        .actions-header { width: 100px; }
+        
+        td {
+            padding: 12px 8px;
+            font-size: 0.8rem;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+        }
+        
+        tr:hover td {
+            background: rgba(59, 111, 212, 0.05);
+        }
+        
+        .watch-id-cell {
+            font-weight: 700;
+            color: var(--primary-color);
+            background: rgba(245,158,11,0.1) !important;
+            font-size: 0.85rem;
+        }
+        
+        .status-row-sold {
+            background-color: rgba(34, 197, 94, 0.08) !important;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .status-row-listing {
+            background-color: rgba(59, 130, 246, 0.08) !important;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .status-row-unlisted {
+            background-color: rgba(107, 114, 128, 0.08) !important;
+            border-left: 4px solid #6b7280;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            display: inline-block;
+            min-width: 60px;
+        }
+        
+        .status-sold { background: #16a34a; }
+        .status-listing { background: #3b82f6; }
+        .status-unlisted { background: #6b7280; }
+        
+        .profit-positive { 
+            background: rgba(16,185,129,0.1) !important;
+            color: #059669;
+            font-weight: 700;
+        }
+        
+        .profit-negative { 
+            background: rgba(239,68,68,0.1) !important;
+            color: #dc2626;
+            font-weight: 700;
+        }
+        
+        .days-cell {
+            background: rgba(245,158,11,0.1) !important;
+            font-weight: 700;
+        }
+        
+        .url-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .url-link:hover {
+            color: #2563eb;
+            transform: scale(1.2);
+        }
+        
+        /* ============= FORM INPUTS ============= */
+        .input-field, .select-field {
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: white;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus, .select-field:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(59, 111, 212, 0.1);
+        }
+        
+        .shipping-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .shipping-cost-input {
+            width: 55px;
+        }
+        
+        .shipping-method-select {
+            width: 80px;
+        }
+        
+        /* ============= ACTION BUTTONS ============= */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .action-row {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .action-button {
+            padding: 6px 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .edit-button { 
+            background: var(--primary-color); 
+            padding: 8px 10px;
+        }
+        .save-button { 
+            background: var(--success-color); 
+            padding: 8px 10px;
+        }
+        .cancel-button { background: var(--danger-color); }
+        .delete-button { background: var(--danger-color); }
+        .ebay-button { 
+            background: var(--primary-color); 
+            padding: 4px 8px; 
+            font-size: 0.65rem; 
+        }
+        
+        .action-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        /* ============= SETTINGS PAGE ============= */
+        .settings-container {
+            background: var(--card-bg-solid);
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .settings-section {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .settings-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .settings-subtitle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.1);
+        }
+        
+        .brands-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            min-height: 60px;
+        }
+        
+        .brand-tag {
+            background: linear-gradient(135deg, var(--primary-color), #2563eb);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .brand-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .brand-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0;
+            margin-left: 4px;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .brand-remove:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .button-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 111, 212, 0.3);
+        }
+        
+        .button-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 111, 212, 0.4);
+        }
+        
+        /* ============= MODALS ============= */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .modal-title {
+            margin: 0 0 20px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .modal-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.1);
+        }
+        
+        .modal-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .button-secondary {
+            padding: 10px 20px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .button-secondary:hover {
+            background: #4b5563;
+        }
+        
+        /* ============= NOTES PAGE ============= */
+        .notes-container {
+            background: var(--card-bg-solid);
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .notes-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .notes-textarea {
+            width: 100%;
+            height: 500px;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            outline: none;
+            resize: vertical;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+        
+        .notes-textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.1);
+            background: white;
+        }
+        
+        /* ============= UTILITIES ============= */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e5e7eb;
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-weight: 500;
+        }
+        
+        .success-message {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-weight: 500;
+        }
+        
+        .offline-indicator {
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .days-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-weight: 700;
+        }
+        
+        .profit-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-weight: 700;
+        }
+        
+        /* ============= RESPONSIVE ============= */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 75px;
+            }
+            
+            .main-content {
+                margin-left: 75px;
+            }
+            
+            .sidebar-title .title-text,
+            .menu-item .menu-text {
+                display: none;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 16px;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .page-title {
+                font-size: 1.4rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .inventory-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            th, td {
+                font-size: 0.7rem;
+                padding: 8px 4px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-header {
+                padding: 16px;
+            }
+            
+            .inventory-container {
+                padding: 16px;
+            }
+            
+            .dashboard-card {
+                padding: 20px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+        
+        /* ============= ANIMATIONS ============= */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* ============= CUSTOM SCROLLBAR ============= */
+        .table-wrapper::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
 <body>
-<h2>時計仕入アシスト</h2>
-<input type="file" id="fileInput">
-<button onclick="analyze()">解析</button>
+    <div class="app-container">
+        <!-- ============= SIDEBAR ============= -->
+        <nav class="sidebar" id="sidebar">
+            <button class="toggle-btn" onclick="toggleSidebar()">‹</button>
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">
+                    ⌚ <span class="title-text">Watch OS</span>
+                </h1>
+            </div>
+            <div class="sidebar-menu">
+                <button class="menu-item active" onclick="showPage('dashboard')">
+                    📊 <span class="menu-text">ダッシュボード</span>
+                </button>
+                <button class="menu-item" onclick="showPage('inventory')">
+                    📦 <span class="menu-text">在庫管理</span>
+                </button>
+                <button class="menu-item" onclick="showPage('kpi')">
+                    📈 <span class="menu-text">月間KPI</span>
+                </button>
+                <button class="menu-item" onclick="showPage('analytics')">
+                    📊 <span class="menu-text">分析レポート</span>
+                </button>
+                <button class="menu-item" onclick="showPage('settings')">
+                    ⚙️ <span class="menu-text">設定</span>
+                </button>
+                <button class="menu-item" onclick="showPage('notes')">
+                    📝 <span class="menu-text">メモ</span>
+                </button>
+            </div>
+        </nav>
 
-<div id="result"></div>
+        <!-- ============= MAIN CONTENT ============= -->
+        <main class="main-content" id="main-content">
+            <!-- ============= DASHBOARD PAGE ============= -->
+            <div id="dashboard" class="page active">
+                <div class="page-header">
+                    <h1 class="page-title">📊 ダッシュボード</h1>
+                    <p class="page-subtitle">売上・在庫・利益の概要を確認</p>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">📦</div>
+                                総在庫数
+                            </div>
+                        </div>
+                        <div class="card-value" id="total-inventory">0</div>
+                        <div class="card-subtitle">登録済み商品数</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">💰</div>
+                                今月売上
+                            </div>
+                            <div class="card-trend" id="sales-trend">+12%</div>
+                        </div>
+                        <div class="card-value" id="monthly-sales">¥0</div>
+                        <div class="card-subtitle">今月の総売上金額</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">📊</div>
+                                今月利益
+                            </div>
+                            <div class="card-trend" id="profit-trend">+8%</div>
+                        </div>
+                        <div class="card-value" id="monthly-profit">¥0</div>
+                        <div class="card-subtitle">手数料・コスト差し引き後</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">⏰</div>
+                                平均販売日数
+                            </div>
+                        </div>
+                        <div class="card-value" id="avg-days">0日</div>
+                        <div class="card-subtitle">出品から売却までの平均</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">📈</div>
+                                販売成功率
+                            </div>
+                        </div>
+                        <div class="card-value" id="success-rate">0%</div>
+                        <div class="card-subtitle">出品商品の売却率</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">💎</div>
+                                人気ブランド
+                            </div>
+                        </div>
+                        <div class="card-value" id="top-brand">SEIKO</div>
+                        <div class="card-subtitle">最も売れているブランド</div>
+                    </div>
+                </div>
+            </div>
 
-<script>
-async function analyze() {
-    const fileInput = document.getElementById("fileInput");
-    if (!fileInput.files.length) return alert("画像を選んでください");
+            <!-- ============= INVENTORY PAGE ============= -->
+            <div id="inventory" class="page">
+                <div class="inventory-container">
+                    <div class="inventory-header">
+                        <div class="inventory-title">
+                            📦 在庫管理
+                            <div class="connection-status" id="connection-status">
+                                <div class="status-indicator" id="status-dot"></div>
+                                <span id="status-text">接続中...</span>
+                            </div>
+                        </div>
+                        <button class="add-button" onclick="addNewRow()">
+                            ➕ 新規追加
+                        </button>
+                    </div>
+                    
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="ブランド、モデル、ステータスで検索..." onkeyup="filterTable(this.value)">
+                    </div>
 
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table id="inventory-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable-header watch-id-header" onclick="sortTable('watch_id')">
+                                            管理番号 <span class="sort-indicator" id="sort-watch_id"></span>
+                                        </th>
+                                        <th class="sortable-header brand-header" onclick="sortTable('brand')">
+                                            ブランド <span class="sort-indicator" id="sort-brand"></span>
+                                        </th>
+                                        <th class="sortable-header model-header" onclick="sortTable('model')">
+                                            モデル <span class="sort-indicator" id="sort-model"></span>
+                                        </th>
+                                        <th class="sortable-header condition-header" onclick="sortTable('condition')">
+                                            状態 <span class="sort-indicator" id="sort-condition"></span>
+                                        </th>
+                                        <th class="url-header">メルカリURL</th>
+                                        <th class="sortable-header date-header" onclick="sortTable('listing_date')">
+                                            出品日 <span class="sort-indicator" id="sort-listing_date"></span>
+                                        </th>
+                                        <th class="sortable-header price-header" onclick="sortTable('purchase_price')">
+                                            仕入価格 <span class="sort-indicator" id="sort-purchase_price"></span>
+                                        </th>
+                                        <th class="sortable-header shipping-header" onclick="sortTable('shipping_cost')">
+                                            送料 <span class="sort-indicator" id="sort-shipping_cost"></span>
+                                        </th>
+                                        <th class="sortable-header cost-header" onclick="sortTable('other_cost')">
+                                            他コスト <span class="sort-indicator" id="sort-other_cost"></span>
+                                        </th>
+                                        <th class="sortable-header destination-header" onclick="sortTable('destination')">
+                                            販売先 <span class="sort-indicator" id="sort-destination"></span>
+                                        </th>
+                                        <th class="sortable-header status-header" onclick="sortTable('status')">
+                                            ステータス <span class="sort-indicator" id="sort-status"></span>
+                                        </th>
+                                        <th class="url-header">販売先URL</th>
+                                        <th class="sortable-header date-header" onclick="sortTable('sold_date')">
+                                            販売日 <span class="sort-indicator" id="sort-sold_date"></span>
+                                        </th>
+                                        <th class="sortable-header price-header" onclick="sortTable('selling_price')">
+                                            売値 <span class="sort-indicator" id="sort-selling_price"></span>
+                                        </th>
+                                        <th class="sortable-header days-header" onclick="sortTable('days_to_sell')">
+                                            ⏰日数 <span class="sort-indicator" id="sort-days_to_sell"></span>
+                                        </th>
+                                        <th class="sortable-header profit-header" onclick="sortTable('profit')">
+                                            💰利益 <span class="sort-indicator" id="sort-profit"></span>
+                                        </th>
+                                        <th class="actions-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <tr>
+                                        <td colspan="17" class="loading">
+                                            <span class="loading-spinner"></span>
+                                            データを読み込み中...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    const res = await fetch("/analyze", {  // ←相対パスに変更
-        method: "POST",
-        body: formData
-    });
+            <!-- ============= KPI PAGE ============= -->
+            <div id="kpi" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">📈 月間KPI</h1>
+                    <p class="page-subtitle" id="current-month-subtitle">目標達成状況を確認</p>
+                </div>
+                
+                <div class="kpi-container">
+                    <div class="kpi-header">
+                        📈 月間KPI - <span id="current-month"></span>
+                    </div>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-title">🎯 売上目標</div>
+                            <div class="kpi-value" style="color: #3b6fd4;" id="sales-kpi-value">¥0</div>
+                            <div class="kpi-target" id="sales-kpi-target">目標: ¥0</div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="background: #3b6fd4; width: 0%;" id="sales-progress"></div>
+                                </div>
+                                <div class="progress-text" id="sales-progress-text">0% 達成</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-title">💰 利益目標</div>
+                            <div class="kpi-value" style="color: #10b981;" id="profit-kpi-value">¥0</div>
+                            <div class="kpi-target" id="profit-kpi-target">目標: ¥0</div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="background: #10b981; width: 0%;" id="profit-progress"></div>
+                                </div>
+                                <div class="progress-text" id="profit-progress-text">0% 達成</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-title">📦 販売数目標</div>
+                            <div class="kpi-value" style="color: #f59e0b;" id="quantity-kpi-value">0</div>
+                            <div class="kpi-target" id="quantity-kpi-target">目標: 0個</div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="background: #f59e0b; width: 0%;" id="quantity-progress"></div>
+                                </div>
+                                <div class="progress-text" id="quantity-progress-text">0% 達成</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    const data = await res.json();
+            <!-- ============= ANALYTICS PAGE ============= -->
+            <div id="analytics" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">📊 分析レポート</h1>
+                    <p class="page-subtitle">売上トレンドと商品パフォーマンスの詳細分析</p>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">🏆</div>
+                                ベストセラー商品
+                            </div>
+                        </div>
+                        <div class="card-value" id="best-seller">-</div>
+                        <div class="card-subtitle">最高利益商品</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">📈</div>
+                                平均利益率
+                            </div>
+                        </div>
+                        <div class="card-value" id="profit-margin">0%</div>
+                        <div class="card-subtitle">売値に対する利益の割合</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">🚀</div>
+                                最速販売
+                            </div>
+                        </div>
+                        <div class="card-value" id="fastest-sale">0日</div>
+                        <div class="card-subtitle">最短販売期間</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon">🎯</div>
+                                在庫回転率
+                            </div>
+                        </div>
+                        <div class="card-value" id="inventory-turnover">0回</div>
+                        <div class="card-subtitle">月間在庫回転回数</div>
+                    </div>
+                </div>
+            </div>
 
-    let html = "<h3>AI判定結果</h3><pre>" + data.ai_result + "</pre>";
-    html += "<h3>検索リンク</h3><ul>";
-    data.watches.forEach(w => {
-        html += `<li>${w.brand_model} - <a href="${w.mercari_url}" target="_blank">メルカリ</a> | <a href="${w.yahoo_url}" target="_blank">ヤフオク</a></li>`;
-    });
-    html += "</ul>";
+            <!-- ============= SETTINGS PAGE ============= -->
+            <div id="settings" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">⚙️ システム設定</h1>
+                    <p class="page-subtitle">KPI目標・手数料・ブランド管理</p>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <div class="settings-subtitle">🎯 月間KPI目標設定</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">売上目標（円）</label>
+                                <input type="number" id="sales-goal" class="form-input" placeholder="500000" value="500000">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">利益目標（円）</label>
+                                <input type="number" id="profit-goal" class="form-input" placeholder="150000" value="150000">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">販売数目標（個）</label>
+                                <input type="number" id="quantity-goal" class="form-input" placeholder="20" value="20">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <div class="settings-subtitle">💳 プラットフォーム手数料設定（%）</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">メルカリ手数料</label>
+                                <input type="number" id="mercari-fee" class="form-input" value="10.0" step="0.1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">ヤフオク手数料</label>
+                                <input type="number" id="yahoo-fee" class="form-input" value="8.8" step="0.1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">PayPayフリマ手数料</label>
+                                <input type="number" id="paypay-fee" class="form-input" value="5.0" step="0.1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">eBay手数料</label>
+                                <input type="number" id="ebay-fee" class="form-input" value="13.25" step="0.1" max="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <div class="settings-subtitle">🏷️ ブランド管理</div>
+                        <label class="form-label">登録済みブランド</label>
+                        <div class="brands-container" id="brands-container">
+                            <!-- ブランドタグがここに表示される -->
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" id="new-brand" class="form-input" placeholder="新しいブランド名を入力" style="max-width: 250px;">
+                            <button class="button-primary" onclick="addBrand()">ブランド追加</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <div class="settings-subtitle">🌐 eBay連携設定</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">eBay APP ID</label>
+                                <input type="text" id="ebay-app-id" class="form-input" placeholder="eBay Developer App ID" value="ShotaMak-WatchRes-PRD-b4ec29b67-7e96f3b5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">配送プロファイルID</label>
+                                <input type="text" id="shipping-profile-id" class="form-input" placeholder="Shipping Profile ID" value="255340181018">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">返品ポリシーID</label>
+                                <input type="text" id="return-profile-id" class="form-input" placeholder="Return Policy ID" value="255340211018">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">支払いプロファイルID</label>
+                                <input type="text" id="payment-profile-id" class="form-input" placeholder="Payment Profile ID" value="276123165018">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="button-primary" onclick="saveSettings()">💾 設定を保存</button>
+                </div>
+            </div>
 
-    document.getElementById("result").innerHTML = html;
+            <!-- ============= NOTES PAGE ============= -->
+            <div id="notes" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">📝 メモ</h1>
+                    <p class="page-subtitle">自由にメモを記録・管理</p>
+                </div>
+                
+                <div class="notes-container">
+                    <div class="form-group">
+                        <textarea id="notes-content" class="notes-textarea" placeholder="ここに自由にメモを記入してください...
+
+例：
+- 今月の目標: 売上50万円
+- 人気商品: SEIKO 5シリーズ
+- 仕入れ予定: オメガ シーマスター
+- 注意点: eBay出品時の関税表記
+- アイデア: 限定モデルの先行販売
+
+"></textarea>
+                    </div>
+                    <button class="button-primary" onclick="saveNotes()">💾 メモを保存</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============= eBay出品モーダル ============= -->
+    <div id="ebay-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">🛒 eBay自動出品</h3>
+            
+            <div class="modal-form-group">
+                <label class="modal-label">タイトル（英語）</label>
+                <input type="text" id="ebay-title" class="modal-input" placeholder="例: Vintage SEIKO Automatic Watch From Japan">
+            </div>
+            
+            <div class="modal-form-group">
+                <label class="modal-label">商品説明文（英語）</label>
+                <textarea id="ebay-description" class="modal-textarea" placeholder="例: Authentic vintage watch in excellent working condition. Automatic movement, stainless steel case with genuine leather strap. Shows minimal wear and keeps accurate time. A perfect addition to any watch collection."></textarea>
+            </div>
+            
+            <div class="modal-form-group">
+                <label class="modal-label">販売価格（USD）</label>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="number" id="ebay-price" class="modal-input" style="max-width: 150px;" placeholder="150" step="0.01">
+                    <span style="color: #6b7280; font-weight: 500;">USD (送料込み)</span>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="button-secondary" onclick="closeEbayModal()">キャンセル</button>
+                <button class="button-primary" onclick="submitEbayListing()">🚀 eBayに出品</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============= GLOBAL VARIABLES =============
+        const API_BASE_URL = 'https://1b73-60-98-108-78.ngrok-free.app';
+        let inventory = [];
+        let editingId = null;
+        let sortConfig = { key: null, direction: 'asc' };
+        let currentEbayItem = null;
+        let brands = ['SEIKO', 'CASIO', 'CITIZEN', 'OMEGA', 'ROLEX', 'TAG HEUER', 'BREITLING', 'TISSOT', 'ORIENT'];
+        let isOnline = false;
+        
+        const shippingOptions = {
+            'メルカリ': [
+                { name: 'ネコポス', cost: 210 },
+                { name: '宅急便コンパクト', cost: 450 },
+                { name: '宅急便60', cost: 750 }
+            ],
+            'ヤフオク': [
+                { name: 'おてがる配送', cost: 200 },
+                { name: 'ヤフネコパック', cost: 450 },
+                { name: 'ゆうパック', cost: 800 },
+                { name: '定形外', cost: 300 },
+                { name: 'レターパック', cost: 520 }
+            ],
+            'PayPayフリマ': [
+                { name: 'おてがる配送', cost: 200 },
+                { name: 'ネコポス', cost: 210 },
+                { name: 'ゆうパック', cost: 800 }
+            ],
+            'eBay': [
+                { name: 'Standard Shipping', cost: 3000 },
+                { name: 'Expedited Shipping', cost: 3000 },
+                { name: 'Express Shipping', cost: 3000 }
+            ]
+        };
+
+        let platformFees = {
+            'メルカリ': 10.0,
+            'ヤフオク': 8.8,
+            'PayPayフリマ': 5.0,
+            'eBay': 13.25
+        };
+
+        // ============= INITIALIZATION =============
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Watch OS システム起動中...');
+            loadSettings();
+            loadInventory();
+            loadNotes();
+            updateDashboard();
+            updateKPI();
+            renderBrands();
+            updateCurrentMonth();
+            
+            // キーボードショートカット
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        });
+
+        // ============= PAGE NAVIGATION =============
+        function showPage(pageId) {
+            // 全ページを非表示
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 全メニューアイテムのactiveを除去
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 選択されたページを表示
+            document.getElementById(pageId).classList.add('active');
+            
+            // 選択されたメニューアイテムにactiveを追加
+            event.target.classList.add('active');
+
+            // ページ固有の処理
+            if (pageId === 'dashboard') {
+                updateDashboard();
+            } else if (pageId === 'inventory') {
+                renderTable();
+            } else if (pageId === 'kpi') {
+                updateKPI();
+            } else if (pageId === 'analytics') {
+                updateAnalytics();
+            }
+            
+            console.log(`📄 ${pageId} ページを表示`);
+        }
+
+        // ============= SIDEBAR =============
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            
+            // ローカルストレージに状態を保存
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+        }
+
+        // ============= DATA PERSISTENCE =============
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    inventory: inventory,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('watchOS_inventory_backup', JSON.stringify(data));
+                console.log('💾 ローカルストレージに保存完了');
+            } catch (error) {
+                console.error('❌ ローカルストレージ保存エラー:', error);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('watchOS_inventory_backup');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    console.log('📱 ローカルストレージからデータ復元:', data.inventory?.length || 0, '件');
+                    return data.inventory || [];
+                }
+                return [];
+            } catch (error) {
+                console.error('❌ ローカルストレージ読み込みエラー:', error);
+                return [];
+            }
+        }
+
+        // ============= API COMMUNICATION =============
+        async function loadInventory() {
+            try {
+                updateConnectionStatus('connecting');
+                
+                // まずローカルストレージから読み込み
+                const localData = loadFromLocalStorage();
+                if (localData.length > 0) {
+                    inventory = localData;
+                    renderTable();
+                    updateDashboard();
+                }
+
+                // サーバーからの取得を試行
+                const response = await fetch(`${API_BASE_URL}/api/inventory`, {
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const serverData = await response.json();
+                inventory = serverData.map(item => ({
+                    ...item,
+                    profit: calculateProfit(item.selling_price, item.purchase_price, item.shipping_cost, item.other_cost, item.destination),
+                    days_to_sell: calculateDaysToSell(item.listing_date, item.sold_date)
+                }));
+                
+                renderTable();
+                updateDashboard();
+                updateConnectionStatus('online');
+                saveToLocalStorage();
+                
+                console.log('🌐 サーバーからデータ取得成功:', inventory.length, '件');
+                
+            } catch (error) {
+                console.log('🔄 サーバー接続失敗 - ローカルデータを使用:', error.message);
+                updateConnectionStatus('offline');
+                
+                if (inventory.length === 0) {
+                    const localData = loadFromLocalStorage();
+                    inventory = localData;
+                    renderTable();
+                    updateDashboard();
+                }
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            
+            switch (status) {
+                case 'online':
+                    statusDot.className = 'status-indicator';
+                    statusText.textContent = 'オンライン';
+                    isOnline = true;
+                    break;
+                case 'offline':
+                    statusDot.className = 'status-indicator offline';
+                    statusText.textContent = 'オフライン';
+                    isOnline = false;
+                    break;
+                case 'connecting':
+                    statusDot.className = 'status-indicator';
+                    statusText.textContent = '接続中...';
+                    break;
+            }
+        }
+
+        // ============= DASHBOARD =============
+        function updateDashboard() {
+            const totalInventory = inventory.length;
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            
+            const monthlySold = inventory.filter(item => {
+                if (!item.sold_date) return false;
+                const soldDate = new Date(item.sold_date);
+                return soldDate.getMonth() + 1 === currentMonth && soldDate.getFullYear() === currentYear;
+            });
+            
+            const monthlySales = monthlySold.reduce((sum, item) => sum + (item.selling_price || 0), 0);
+            const monthlyProfit = monthlySold.reduce((sum, item) => sum + (item.profit || 0), 0);
+            
+            // 平均販売日数計算
+            const soldItems = monthlySold.filter(item => item.days_to_sell);
+            const avgDays = soldItems.length > 0 
+                ? Math.round(soldItems.reduce((sum, item) => sum + item.days_to_sell, 0) / soldItems.length)
+                : 0;
+            
+            // 販売成功率計算
+            const listedItems = inventory.filter(item => item.status === '出品中' || item.status === '売却済み');
+            const successRate = listedItems.length > 0 
+                ? Math.round((monthlySold.length / listedItems.length) * 100)
+                : 0;
+            
+            // 人気ブランド計算
+            const brandCounts = {};
+            monthlySold.forEach(item => {
+                if (item.brand) {
+                    brandCounts[item.brand] = (brandCounts[item.brand] || 0) + 1;
+                }
+            });
+            const topBrand = Object.keys(brandCounts).sort((a, b) => brandCounts[b] - brandCounts[a])[0] || 'データなし';
+
+            // DOM更新
+            document.getElementById('total-inventory').textContent = totalInventory;
+            document.getElementById('monthly-sales').textContent = `¥${monthlySales.toLocaleString()}`;
+            document.getElementById('monthly-profit').textContent = `¥${monthlyProfit.toLocaleString()}`;
+            document.getElementById('avg-days').textContent = `${avgDays}日`;
+            document.getElementById('success-rate').textContent = `${successRate}%`;
+            document.getElementById('top-brand').textContent = topBrand;
+        }
+
+        // ============= KPI =============
+        function updateKPI() {
+            const settings = getSettings();
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            
+            const monthlySold = inventory.filter(item => {
+                if (!item.sold_date) return false;
+                const soldDate = new Date(item.sold_date);
+                return soldDate.getMonth() + 1 === currentMonth && soldDate.getFullYear() === currentYear;
+            });
+            
+            const actualSales = monthlySold.reduce((sum, item) => sum + (item.selling_price || 0), 0);
+            const actualProfit = monthlySold.reduce((sum, item) => sum + (item.profit || 0), 0);
+            const actualQuantity = monthlySold.length;
+            
+            const salesGoal = settings.salesGoal || 500000;
+            const profitGoal = settings.profitGoal || 150000;
+            const quantityGoal = settings.quantityGoal || 20;
+            
+            // 売上KPI
+            const salesProgress = Math.min((actualSales / salesGoal) * 100, 100);
+            document.getElementById('sales-kpi-value').textContent = `¥${actualSales.toLocaleString()}`;
+            document.getElementById('sales-kpi-target').textContent = `目標: ¥${salesGoal.toLocaleString()}`;
+            document.getElementById('sales-progress').style.width = `${salesProgress}%`;
+            document.getElementById('sales-progress-text').textContent = `${Math.round(salesProgress)}% 達成`;
+            
+            // 利益KPI
+            const profitProgress = Math.min((actualProfit / profitGoal) * 100, 100);
+            document.getElementById('profit-kpi-value').textContent = `¥${actualProfit.toLocaleString()}`;
+            document.getElementById('profit-kpi-target').textContent = `目標: ¥${profitGoal.toLocaleString()}`;
+            document.getElementById('profit-progress').style.width = `${profitProgress}%`;
+            document.getElementById('profit-progress-text').textContent = `${Math.round(profitProgress)}% 達成`;
+            
+            // 販売数KPI
+            const quantityProgress = Math.min((actualQuantity / quantityGoal) * 100, 100);
+            document.getElementById('quantity-kpi-value').textContent = actualQuantity;
+            document.getElementById('quantity-kpi-target').textContent = `目標: ${quantityGoal}個`;
+            document.getElementById('quantity-progress').style.width = `${quantityProgress}%`;
+            document.getElementById('quantity-progress-text').textContent = `${Math.round(quantityProgress)}% 達成`;
+        }
+
+        function updateCurrentMonth() {
+            const now = new Date();
+            const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            document.getElementById('current-month').textContent = `${now.getFullYear()}年${monthNames[now.getMonth()]}`;
+        }
+
+        // ============= ANALYTICS =============
+        function updateAnalytics() {
+            const soldItems = inventory.filter(item => item.status === '売却済み');
+            
+            if (soldItems.length === 0) {
+                document.getElementById('best-seller').textContent = '-';
+                document.getElementById('profit-margin').textContent = '0%';
+                document.getElementById('fastest-sale').textContent = '0日';
+                document.getElementById('inventory-turnover').textContent = '0回';
+                return;
+            }
+            
+            // ベストセラー（最高利益商品）
+            const bestSeller = soldItems.reduce((best, item) => 
+                (item.profit || 0) > (best.profit || 0) ? item : best
+            );
+            document.getElementById('best-seller').textContent = 
+                `${bestSeller.brand} ${bestSeller.model}`.trim() || 'データなし';
+            
+            // 平均利益率
+            const avgProfitMargin = soldItems.reduce((sum, item) => {
+                const margin = item.selling_price > 0 ? (item.profit / item.selling_price) * 100 : 0;
+                return sum + margin;
+            }, 0) / soldItems.length;
+            document.getElementById('profit-margin').textContent = `${Math.round(avgProfitMargin)}%`;
+            
+            // 最速販売
+            const fastestSale = Math.min(...soldItems.map(item => item.days_to_sell || Infinity));
+            document.getElementById('fastest-sale').textContent = 
+                fastestSale === Infinity ? '0日' : `${fastestSale}日`;
+            
+            // 在庫回転率（月間）
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const monthlySold = soldItems.filter(item => {
+                const soldDate = new Date(item.sold_date);
+                return soldDate.getMonth() + 1 === currentMonth && soldDate.getFullYear() === currentYear;
+            });
+            const avgInventory = inventory.length > 0 ? inventory.length : 1;
+            const turnoverRate = Math.round(monthlySold.length / avgInventory * 12 * 10) / 10;
+            document.getElementById('inventory-turnover').textContent = `${turnoverRate}回`;
+        }
+
+        // ============= SETTINGS =============
+        function getSettings() {
+            try {
+                const saved = localStorage.getItem('watchOS_allSettings');
+                return saved ? JSON.parse(saved) : {
+                    salesGoal: 500000,
+                    profitGoal: 150000,
+                    quantityGoal: 20,
+                    platformFees: platformFees,
+                    brands: brands
+                };
+            } catch (error) {
+                return {
+                    salesGoal: 500000,
+                    profitGoal: 150000,
+                    quantityGoal: 20,
+                    platformFees: platformFees,
+                    brands: brands
+                };
+            }
+        }
+
+        function saveSettings() {
+            try {
+                const settings = {
+                    salesGoal: parseInt(document.getElementById('sales-goal').value) || 500000,
+                    profitGoal: parseInt(document.getElementById('profit-goal').value) || 150000,
+                    quantityGoal: parseInt(document.getElementById('quantity-goal').value) || 20,
+                    platformFees: {
+                        'メルカリ': parseFloat(document.getElementById('mercari-fee').value) || 10.0,
+                        'ヤフオク': parseFloat(document.getElementById('yahoo-fee').value) || 8.8,
+                        'PayPayフリマ': parseFloat(document.getElementById('paypay-fee').value) || 5.0,
+                        'eBay': parseFloat(document.getElementById('ebay-fee').value) || 13.25
+                    },
+                    brands: brands,
+                    ebaySettings: {
+                        appId: document.getElementById('ebay-app-id').value,
+                        shippingProfileId: document.getElementById('shipping-profile-id').value,
+                        returnProfileId: document.getElementById('return-profile-id').value,
+                        paymentProfileId: document.getElementById('payment-profile-id').value
+                    }
+                };
+                
+                localStorage.setItem('watchOS_allSettings', JSON.stringify(settings));
+                platformFees = settings.platformFees;
+                
+                // 在庫の利益を再計算
+                inventory.forEach(item => {
+                    item.profit = calculateProfit(item.selling_price, item.purchase_price, item.shipping_cost, item.other_cost, item.destination);
+                });
+                
+                renderTable();
+                updateDashboard();
+                updateKPI();
+                
+                showMessage('設定を保存しました！', 'success');
+                console.log('💾 設定保存完了');
+                
+            } catch (error) {
+                console.error('❌ 設定保存エラー:', error);
+                showMessage('設定の保存に失敗しました', 'error');
+            }
+        }
+
+        function loadSettings() {
+            const settings = getSettings();
+            
+            document.getElementById('sales-goal').value = settings.salesGoal || 500000;
+            document.getElementById('profit-goal').value = settings.profitGoal || 150000;
+            document.getElementById('quantity-goal').value = settings.quantityGoal || 20;
+            
+            if (settings.platformFees) {
+                platformFees = settings.platformFees;
+                document.getElementById('mercari-fee').value = settings.platformFees['メルカリ'] || 10.0;
+                document.getElementById('yahoo-fee').value = settings.platformFees['ヤフオク'] || 8.8;
+                document.getElementById('paypay-fee').value = settings.platformFees['PayPayフリマ'] || 5.0;
+                document.getElementById('ebay-fee').value = settings.platformFees['eBay'] || 13.25;
+            }
+            
+            if (settings.brands) {
+                brands = settings.brands;
+            }
+            
+            if (settings.ebaySettings) {
+                document.getElementById('ebay-app-id').value = settings.ebaySettings.appId || 'ShotaMak-WatchRes-PRD-b4ec29b67-7e96f3b5';
+                document.getElementById('shipping-profile-id').value = settings.ebaySettings.shippingProfileId || '255340181018';
+                document.getElementById('return-profile-id').value = settings.ebaySettings.returnProfileId || '255340211018';
+                document.getElementById('payment-profile-id').value = settings.ebaySettings.paymentProfileId || '276123165018';
+            }
+            
+            // サイドバーの状態を復元
+            const sidebarCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+            if (sidebarCollapsed) {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('main-content').classList.add('expanded');
+            }
+        }
+
+        // ============= BRAND MANAGEMENT =============
+        function renderBrands() {
+            const container = document.getElementById('brands-container');
+            container.innerHTML = '';
+            
+            brands.forEach(brand => {
+                const tag = document.createElement('div');
+                tag.className = 'brand-tag';
+                tag.innerHTML = `${brand} <button class="brand-remove" onclick="removeBrand('${brand}')" title="削除">×</button>`;
+                container.appendChild(tag);
+            });
+        }
+
+        function addBrand() {
+            const input = document.getElementById('new-brand');
+            const brand = input.value.trim().toUpperCase();
+            
+            if (brand && !brands.includes(brand)) {
+                brands.push(brand);
+                renderBrands();
+                input.value = '';
+                showMessage(`ブランド「${brand}」を追加しました`, 'success');
+            } else if (brands.includes(brand)) {
+                showMessage(`ブランド「${brand}」は既に登録済みです`, 'error');
+            }
+        }
+
+        function removeBrand(brand) {
+            if (confirm(`ブランド「${brand}」を削除しますか？`)) {
+                brands = brands.filter(b => b !== brand);
+                renderBrands();
+                showMessage(`ブランド「${brand}」を削除しました`, 'success');
+            }
+        }
+
+        // ============= NOTES =============
+        function saveNotes() {
+            const content = document.getElementById('notes-content').value;
+            localStorage.setItem('watchOS_notes', content);
+            showMessage('メモを保存しました', 'success');
+        }
+
+        function loadNotes() {
+            const saved = localStorage.getItem('watchOS_notes');
+            if (saved) {
+                document.getElementById('notes-content').value = saved;
+            }
+        }
+
+        // ============= INVENTORY TABLE =============
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            if (inventory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="17" style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                            📦 在庫データがありません<br>
+                            <small style="margin-top: 8px; display: block;">「新規追加」ボタンから商品を登録してください</small>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            inventory.forEach((item, index) => {
+                const row = createTableRow(item, index);
+                tbody.appendChild(row);
+            });
+            
+            console.log('📋 テーブル描画完了:', inventory.length, '件');
+        }
+
+        function createTableRow(item, index) {
+            const row = document.createElement('tr');
+            
+            // 行のステータス別スタイル
+            if (item.status === '売却済み') {
+                row.className = 'status-row-sold';
+            } else if (item.status === '出品中') {
+                row.className = 'status-row-listing';
+            } else {
+                row.className = 'status-row-unlisted';
+            }
+
+            const isEditing = editingId === item.id;
+
+            row.innerHTML = `
+                <td class="watch-id-cell">${item.watch_id || generateWatchId(index)}</td>
+                <td>${isEditing ? createBrandSelect(item.brand) : (item.brand || '')}</td>
+                <td>${isEditing ? createInput('model', item.model, 'text', '95px') : (item.model || '')}</td>
+                <td>${isEditing ? createConditionSelect(item.condition) : (item.condition || '')}</td>
+                <td>${isEditing ? createInput('mercari_url', item.mercari_url, 'url', '85px', 'メルカリURL') : createUrlLink(item.mercari_url)}</td>
+                <td>${isEditing ? createInput('listing_date', item.listing_date, 'date', '100px') : (item.listing_date || '-')}</td>
+                <td>${isEditing ? createInput('purchase_price', item.purchase_price === 0 ? '' : item.purchase_price, 'number', '80px') : formatCurrency(item.purchase_price)}</td>
+                <td>${isEditing ? createShippingInput(item) : createShippingDisplay(item)}</td>
+                <td>${isEditing ? createInput('other_cost', item.other_cost, 'number', '70px') : formatCurrency(item.other_cost)}</td>
+                <td>${isEditing ? createDestinationSelect(item.destination) : (item.destination || '')}</td>
+                <td>${isEditing ? createStatusSelect(item.status) : createStatusBadge(item.status)}</td>
+                <td>${isEditing ? createInput('sales_url', item.sales_url, 'url', '85px', '販売先URL') : createUrlLink(item.sales_url)}</td>
+                <td>${isEditing ? createInput('sold_date', item.sold_date, 'date', '100px') : (item.sold_date || '-')}</td>
+                <td>${isEditing ? createInput('selling_price', item.selling_price, 'number', '80px') : formatCurrency(item.selling_price)}</td>
+                <td class="days-cell">${createDaysDisplay(item.days_to_sell)}</td>
+                <td class="${item.profit > 0 ? 'profit-positive' : item.profit < 0 ? 'profit-negative' : ''}">${createProfitDisplay(item.profit)}</td>
+                <td>${createActionButtons(item, isEditing)}</td>
+            `;
+
+            return row;
+        }
+
+        // ============= UI HELPERS =============
+        function createBrandSelect(value) {
+            const options = brands.map(brand => 
+                `<option value="${brand}" ${brand === value ? 'selected' : ''}>${brand}</option>`
+            ).join('');
+            return `<select class="select-field" style="width: 75px;" onchange="updateEditData('brand', this.value)">
+                <option value="">選択</option>${options}
+            </select>`;
+        }
+
+        function createConditionSelect(value) {
+            const conditions = ['新品', '稼働品', '電池交換', 'ジャンク'];
+            const options = conditions.map(cond => 
+                `<option value="${cond}" ${cond === value ? 'selected' : ''}>${cond}</option>`
+            ).join('');
+            return `<select class="select-field" style="width: 70px;" onchange="updateEditData('condition', this.value)">${options}</select>`;
+        }
+
+        function createDestinationSelect(value) {
+            const destinations = ['メルカリ', 'ヤフオク', 'PayPayフリマ', 'eBay'];
+            const options = destinations.map(dest => 
+                `<option value="${dest}" ${dest === value ? 'selected' : ''}>${dest}</option>`
+            ).join('');
+            return `<select class="select-field" style="width: 70px;" onchange="updateEditData('destination', this.value)">${options}</select>`;
+        }
+
+        function createStatusSelect(value) {
+            const statuses = ['未出品', '出品中', '売却済み'];
+            const options = statuses.map(status => 
+                `<option value="${status}" ${status === value ? 'selected' : ''}>${status}</option>`
+            ).join('');
+            return `<select class="select-field" style="width: 80px;" onchange="updateEditData('status', this.value)">${options}</select>`;
+        }
+
+        function createInput(field, value, type, width, placeholder = '') {
+            return `<input type="${type}" class="input-field" style="width: ${width};" value="${value || ''}" 
+                placeholder="${placeholder}" onchange="updateEditData('${field}', this.value)">`;
+        }
+
+        function createShippingInput(item) {
+            const options = (shippingOptions[item.destination] || []).map(option => 
+                `<option value="${option.name}" ${option.name === item.shipping_method ? 'selected' : ''}>${option.name}</option>`
+            ).join('');
+            
+            return `
+                <div class="shipping-input-group">
+                    <input type="number" class="input-field shipping-cost-input" value="${item.shipping_cost || 0}" 
+                        onchange="updateEditData('shipping_cost', this.value)">
+                    <select class="select-field shipping-method-select" 
+                        onchange="updateShippingMethod(this.value, '${item.destination}')">
+                        <option value="">方法</option>${options}
+                    </select>
+                </div>
+            `;
+        }
+
+        function createShippingDisplay(item) {
+            return `
+                <div>
+                    <div style="font-weight: 600;">${formatCurrency(item.shipping_cost)}</div>
+                    <div style="font-size: 0.7rem; color: #6b7280;">${item.shipping_method || ''}</div>
+                </div>
+            `;
+        }
+
+        function createStatusBadge(status) {
+            const badgeClass = status === '売却済み' ? 'status-sold' : 
+                             status === '出品中' ? 'status-listing' : 'status-unlisted';
+            return `<span class="status-badge ${badgeClass}">${status || '未設定'}</span>`;
+        }
+
+        function createUrlLink(url) {
+            return url ? `<a href="${url}" target="_blank" class="url-link" title="外部リンクを開く">🔗</a>` : '-';
+        }
+
+        function createDaysDisplay(days) {
+            if (!days) {
+                return `<div class="days-display" style="color: #9ca3af;">⏰ -</div>`;
+            }
+            
+            const color = days <= 7 ? '#10b981' : days <= 30 ? '#f59e0b' : '#ef4444';
+            return `<div class="days-display" style="color: ${color};">⏰ ${days}</div>`;
+        }
+
+        function createProfitDisplay(profit) {
+            if (profit === undefined || profit === null) {
+                return `<div class="profit-display" style="color: #9ca3af;">💰 -</div>`;
+            }
+            
+            const color = profit > 0 ? '#10b981' : profit < 0 ? '#ef4444' : '#6b7280';
+            return `<div class="profit-display" style="color: ${color};">💰 ${profit.toLocaleString()}</div>`;
+        }
+
+        function createActionButtons(item, isEditing) {
+            if (isEditing) {
+                return `
+                    <div class="action-buttons">
+                        <div class="action-row">
+                            <button class="action-button save-button" onclick="saveEdit(${item.id})" title="保存">💾</button>
+                            <button class="action-button cancel-button" onclick="cancelEdit()" title="キャンセル">❌</button>
+                        </div>
+                        <button class="action-button ebay-button" onclick="openEbayModal(${item.id})" title="eBay出品">eBay</button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="action-buttons">
+                        <div class="action-row">
+                            <button class="action-button edit-button" onclick="startEdit(${item.id})" title="編集">✏️</button>
+                            <button class="action-button delete-button" onclick="deleteItem(${item.id})" title="削除">🗑️</button>
+                        </div>
+                        <button class="action-button ebay-button" onclick="openEbayModal(${item.id})" title="eBay出品">eBay</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ============= INVENTORY OPERATIONS =============
+        function startEdit(id) {
+            editingId = id;
+            renderTable();
+            console.log('✏️ 編集開始:', id);
+        }
+
+        function cancelEdit() {
+            if (editingId && editingId > 1000000000) {
+                inventory = inventory.filter(item => item.id !== editingId);
+            }
+            editingId = null;
+            renderTable();
+            console.log('❌ 編集キャンセル');
+        }
+
+        function updateEditData(field, value) {
+            const item = inventory.find(item => item.id === editingId);
+            if (item) {
+                item[field] = field.includes('price') || field.includes('cost') ? (parseFloat(value) || 0) : value;
+                
+                if (field === 'status' && value === '売却済み' && !item.sold_date) {
+                    item.sold_date = getTodayDate();
+                }
+                
+                item.profit = calculateProfit(item.selling_price, item.purchase_price, item.shipping_cost, item.other_cost, item.destination);
+                item.days_to_sell = calculateDaysToSell(item.listing_date, item.sold_date);
+            }
+        }
+
+        function updateShippingMethod(method, destination) {
+            const option = (shippingOptions[destination] || []).find(opt => opt.name === method);
+            const item = inventory.find(item => item.id === editingId);
+            if (item) {
+                item.shipping_method = method;
+                item.shipping_cost = option ? option.cost : 0;
+                renderTable();
+            }
+        }
+
+        async function saveEdit(id) {
+            const item = inventory.find(item => item.id === id);
+            if (!item) return;
+
+            try {
+                // 新規追加の場合
+                if (typeof id === 'number' && id > 1000000000) {
+                    const maxId = Math.max(0, ...inventory.filter(item => typeof item.id === 'number' && item.id < 1000000000).map(item => item.id));
+                    item.id = maxId + 1;
+                }
+
+                // サーバーに保存を試行（オンラインの場合）
+                if (isOnline) {
+                    const method = typeof id === 'number' && id > 1000000000 ? 'POST' : 'PUT';
+                    const url = method === 'POST' ? `${API_BASE_URL}/api/inventory` : `${API_BASE_URL}/api/inventory/${id}`;
+                    
+                    const response = await fetch(url, {
+                        method,
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify(item)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`サーバーエラー: ${response.status}`);
+                    }
+                }
+
+                editingId = null;
+                saveToLocalStorage();
+                renderTable();
+                updateDashboard();
+                updateKPI();
+                
+                showMessage('保存しました', 'success');
+                console.log('💾 保存完了:', item.watch_id);
+                
+            } catch (error) {
+                console.error('❌ 保存エラー:', error);
+                
+                // オフライン保存として続行
+                editingId = null;
+                saveToLocalStorage();
+                renderTable();
+                updateDashboard();
+                updateKPI();
+                
+                showMessage('オフライン保存しました', 'success');
+            }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('この商品を削除しますか？\nこの操作は元に戻せません。')) return;
+            
+            try {
+                inventory = inventory.filter(item => item.id !== id);
+                
+                // サーバーからも削除（オンラインの場合）
+                if (isOnline && typeof id === 'number' && id < 1000000000) {
+                    await fetch(`${API_BASE_URL}/api/inventory/${id}`, { 
+                        method: 'DELETE',
+                        headers: {
+                            'ngrok-skip-browser-warning': 'true'
+                        }
+                    });
+                }
+                
+                saveToLocalStorage();
+                renderTable();
+                updateDashboard();
+                updateKPI();
+                
+                showMessage('削除しました', 'success');
+                console.log('🗑️ 削除完了:', id);
+                
+            } catch (error) {
+                console.error('❌ 削除エラー:', error);
+                
+                // ローカルでは削除済みなので、それで続行
+                saveToLocalStorage();
+                renderTable();
+                updateDashboard();
+                updateKPI();
+                
+                showMessage('削除しました（ローカル）', 'success');
+            }
+        }
+
+        function addNewRow() {
+            const tempId = Date.now();
+            const today = getTodayDate();
+            const uniqueWatchId = generateUniqueWatchId();
+            
+            const newItem = {
+                id: tempId,
+                watch_id: uniqueWatchId,
+                brand: '',
+                model: '',
+                condition: '稼働品',
+                mercari_url: '',
+                purchase_price: 0,
+                selling_price: 0,
+                destination: 'メルカリ',
+                status: '未出品',
+                listing_date: today,
+                sold_date: '',
+                days_to_sell: null,
+                profit: 0,
+                sales_url: '',
+                shipping_cost: 210,
+                shipping_method: 'ネコポス',
+                other_cost: 0
+            };
+            
+            inventory.unshift(newItem);
+            editingId = tempId;
+            renderTable();
+            
+            showMessage('新しい商品を追加しました', 'success');
+            console.log('➕ 新規追加:', uniqueWatchId);
+        }
+
+        // ============= UTILITIES =============
+        function generateWatchId(index) {
+            return `WT${String(index + 1).padStart(4, '0')}`;
+        }
+
+        function generateUniqueWatchId() {
+            if (!inventory || inventory.length === 0) return 'WT0001';
+            
+            let maxNumber = 0;
+            inventory.forEach(item => {
+                if (item.watch_id && item.watch_id.startsWith('WT')) {
+                    const number = parseInt(item.watch_id.substring(2));
+                    if (!isNaN(number) && number > maxNumber) {
+                        maxNumber = number;
+                    }
+                }
+            });
+            return `WT${String(maxNumber + 1).padStart(4, '0')}`;
+        }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function formatCurrency(amount) {
+            return `¥${(amount || 0).toLocaleString()}`;
+        }
+
+        function calculateProfit(sellingPrice, purchasePrice, shippingCost = 0, otherCost = 0, destination = 'メルカリ') {
+            const price = sellingPrice || 0;
+            const purchase = purchasePrice || 0;
+            const shipping = shippingCost || 0;
+            const other = otherCost || 0;
+            
+            const feeRate = platformFees[destination] || 10.0;
+            const platformFee = Math.round(price * (feeRate / 100));
+            
+            return price - purchase - shipping - other - platformFee;
+        }
+
+        function calculateDaysToSell(listingDate, soldDate) {
+            if (!listingDate || !soldDate) return null;
+            const listing = new Date(listingDate);
+            const sold = new Date(soldDate);
+            const diffTime = Math.abs(sold - listing);
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        // ============= SEARCH & SORT =============
+        function filterTable(searchTerm) {
+            const rows = document.querySelectorAll('#table-body tr');
+            const term = searchTerm.toLowerCase();
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const visible = text.includes(term);
+                row.style.display = visible ? '' : 'none';
+            });
+            
+            console.log('🔍 検索:', searchTerm);
+        }
+
+        function sortTable(key) {
+            // ソート方向の決定
+            let direction = 'asc';
+            if (sortConfig.key === key && sortConfig.direction === 'asc') {
+                direction = 'desc';
+            }
+            sortConfig = { key, direction };
+            
+            // ソートインジケーターの更新
+            document.querySelectorAll('.sort-indicator').forEach(el => el.textContent = '');
+            document.getElementById(`sort-${key}`).textContent = direction === 'asc' ? '↑' : '↓';
+            
+            // データのソート
+            inventory.sort((a, b) => {
+                let aValue = a[key];
+                let bValue = b[key];
+
+                // 管理番号の場合は数値として比較
+                if (key === 'watch_id') {
+                    aValue = parseInt((aValue || '').replace('WT', '')) || 0;
+                    bValue = parseInt((bValue || '').replace('WT', '')) || 0;
+                }
+                
+                // 数値フィールドの場合
+                if (['purchase_price', 'selling_price', 'shipping_cost', 'other_cost', 'profit', 'days_to_sell'].includes(key)) {
+                    aValue = parseFloat(aValue) || 0;
+                    bValue = parseFloat(bValue) || 0;
+                }
+
+                // 日付フィールドの場合
+                if (['listing_date', 'sold_date'].includes(key)) {
+                    aValue = new Date(aValue || '1900-01-01');
+                    bValue = new Date(bValue || '1900-01-01');
+                }
+
+                // 文字列フィールドの場合
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (aValue < bValue) {
+                    return direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+            
+            renderTable();
+            console.log('🔄 ソート:', key, direction);
+        }
+
+        // ============= EBAY MODAL =============
+        function openEbayModal(itemId) {
+            const item = inventory.find(i => i.id === itemId);
+            if (!item) return;
+            
+            currentEbayItem = item;
+            document.getElementById('ebay-title').value = `${item.brand} ${item.model} Watch From Japan`.trim();
+            document.getElementById('ebay-description').value = '';
+            document.getElementById('ebay-price').value = Math.round((item.selling_price || 10000) / 150);
+            document.getElementById('ebay-modal').style.display = 'flex';
+            
+            console.log('🛒 eBayモーダル表示:', item.watch_id);
+        }
+
+        function closeEbayModal() {
+            document.getElementById('ebay-modal').style.display = 'none';
+            currentEbayItem = null;
+        }
+
+        async function submitEbayListing() {
+            if (!currentEbayItem) return;
+            
+            const title = document.getElementById('ebay-title').value.trim();
+            const description = document.getElementById('ebay-description').value.trim();
+            const price = parseFloat(document.getElementById('ebay-price').value);
+            
+            if (!title || !description || !price) {
+                showMessage('すべての項目を入力してください', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/ebay-auto-list`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description: generateEbayDescription(title, description),
+                        price_usd: price,
+                        brand: currentEbayItem.brand || 'Unbranded'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    currentEbayItem.sales_url = `https://ebay.com/itm/${data.item_id}`;
+                    saveToLocalStorage();
+                    renderTable();
+                    closeEbayModal();
+                    showMessage('eBayに自動出品されました！', 'success');
+                } else {
+                    showMessage('eBay出品に失敗しました: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('❌ eBay出品エラー:', error);
+                showMessage('eBay自動出品に失敗しました', 'error');
+            }
+        }
+
+        function generateEbayDescription(titleEn, descriptionEn) {
+            return `<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style type="text/css">
+.main1 { 
+    border: 1px solid #000; 
+    border-radius: 5px; 
+    margin: 0 auto; 
+    width: 100%; 
+    padding: 0 20px 10px; 
+    background: #fff; 
+    box-sizing: border-box; 
+    word-break: break-all; 
 }
-</script>
+.main1 p, .main1 span { line-height: 24px; font-size: 18px }
+.main1 h1 { font-size: 26px !important; margin: 30px 0; text-align: center; color: #000 }
+.main1 h2 { 
+    margin: 0 0 10px 0; 
+    color: #000; 
+    font-size: 22px; 
+    line-height: 1.2; 
+    text-align: left;
+    position: relative;
+    background-color: #3565f2;
+    padding: 10px;
+    margin-bottom: 20px !important;
+    color: #000 !important;
+}
+.main1 h2:before { 
+    position: absolute;
+    content: "";
+    top: 100%;
+    left: 0;
+    border: none;
+    border-right: 20px solid #999;
+    border-bottom: 15px solid transparent;
+}
+.main1 p, .main1 .product_dec div { margin: 0; padding: 0 0 20px 0; color: #333; text-align: left }
+</style>
+<div class="main1">
+<h1>${titleEn}</h1>
+<section class="product_dec">
+<h2 style="background-color: rgb(204, 177, 67); color: rgb(0, 0, 0);">Description</h2>
+<p typeof="Product" vocab="http://schema.org/">${descriptionEn}</p>
+</section>
+<aside>
+<div class="hasso">
+<h2 style="background-color: rgb(204, 177, 67); color: rgb(0, 0, 0);">Shipping</h2>
+<p>FedEx or DHL or Japan Post</p>
+<p>Tracking number will be attached.</p>
+</div>
+<div class="tyuui">
+<h2 style="background-color: rgb(204, 177, 67); color: rgb(0, 0, 0);">International Buyers - Please Note:</h2>
+<p>Customs duties and other taxes are not included in the item price and shipping fee.<br />
+*For residents of the United States, shipping and customs duties are included in the item price.<br />
+<br />
+Please check with your country customs office for these additional costs before bidding or purchasing.<br />
+<br />
+Additionally, if your delivery destination is a remote area, FedEx or DHL may charge an additional fee.<br />
+In that case, you may be required to pay an additional charge of $15 to $20.</p>
+</div>
+</aside>
+</div>`;
+        }
+
+        // ============= KEYBOARD SHORTCUTS =============
+        function handleKeyboardShortcuts(event) {
+            if (event.ctrlKey || event.metaKey) {
+                switch (event.key) {
+                    case 'n':
+                        event.preventDefault();
+                        addNewRow();
+                        break;
+                    case 's':
+                        event.preventDefault();
+                        if (editingId) {
+                            saveEdit(editingId);
+                        } else {
+                            saveSettings();
+                        }
+                        break;
+                    case 'f':
+                        event.preventDefault();
+                        document.querySelector('.search-input').focus();
+                        break;
+                }
+            }
+            
+            if (event.key === 'Escape') {
+                if (document.getElementById('ebay-modal').style.display === 'flex') {
+                    closeEbayModal();
+                } else if (editingId) {
+                    cancelEdit();
+                }
+            }
+        }
+
+        // ============= MESSAGE SYSTEM =============
+        function showMessage(message, type = 'success') {
+            const messageEl = document.createElement('div');
+            messageEl.className = type === 'success' ? 'success-message' : 'error-message';
+            messageEl.textContent = message;
+            messageEl.style.position = 'fixed';
+            messageEl.style.top = '20px';
+            messageEl.style.right = '20px';
+            messageEl.style.zIndex = '3000';
+            messageEl.style.minWidth = '200px';
+            messageEl.style.borderRadius = '8px';
+            messageEl.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                messageEl.style.opacity = '0';
+                setTimeout(() => {
+                    if (messageEl.parentNode) {
+                        messageEl.parentNode.removeChild(messageEl);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // ============= EVENT LISTENERS =============
+        document.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('ebay-modal')) {
+                closeEbayModal();
+            }
+        });
+
+        // Enter キーでブランド追加
+        document.addEventListener('keydown', function(event) {
+            if (event.target.id === 'new-brand' && event.key === 'Enter') {
+                addBrand();
+            }
+        });
+
+        console.log('🎯 Watch OS システム準備完了');
+    </script>
 </body>
 </html>
