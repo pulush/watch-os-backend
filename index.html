@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>時計仕入アシスト</h2>
+<input type="file" id="fileInput">
+<button onclick="analyze()">解析</button>
+
+<div id="result"></div>
+
+<script>
+async function analyze() {
+    const fileInput = document.getElementById("fileInput");
+    if (!fileInput.files.length) return alert("画像を選んでください");
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const res = await fetch("/analyze", {  // ←相対パスに変更
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+
+    let html = "<h3>AI判定結果</h3><pre>" + data.ai_result + "</pre>";
+    html += "<h3>検索リンク</h3><ul>";
+    data.watches.forEach(w => {
+        html += `<li>${w.brand_model} - <a href="${w.mercari_url}" target="_blank">メルカリ</a> | <a href="${w.yahoo_url}" target="_blank">ヤフオク</a></li>`;
+    });
+    html += "</ul>";
+
+    document.getElementById("result").innerHTML = html;
+}
+</script>
+</body>
+</html>
