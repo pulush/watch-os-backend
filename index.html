@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch OS - æè¨ç©è²©ç®¡çã·ã¹ãã </title>
+    <title>Watch OS - 時計物販管理システム</title>
     <style>
         :root {
             --primary-color: #3b6fd4;
@@ -12,14 +12,14 @@
             --danger-color: #ef4444;
             --warning-color: #f59e0b;
             --dark-bg: #1a2b4a;
-            --gradient-bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --card-bg-solid: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255,255,255,0.1);
+            --card-bg-solid: rgba(255,255,255,0.95);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--gradient-bg); min-height: 100vh; overflow-x: hidden; }
         .app-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: #ffffff; color: #333; padding: 20px 0; position: fixed; height: 100vh; z-index: 1000; transition: all 0.3s ease; border-right: 1px solid #e0e0e0; box-shadow: 2px 0 8px rgba(0,0,0,0.06); }
+        .sidebar { width: 260px; background: rgba(26, 43, 74, 0.95); color: white; padding: 20px 0; position: fixed; height: 100vh; z-index: 1000; transition: all 0.3s ease; backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.1); }
         .sidebar.collapsed { width: 75px; }
         .sidebar-header { padding: 0 20px 30px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 20px; }
         .sidebar-title { font-size: 1.3rem; font-weight: 700; color: var(--warning-color); display: flex; align-items: center; gap: 12px; }
@@ -35,11 +35,11 @@
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .page-header { background: var(--card-bg); padding: 24px; border-radius: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.2); }
+        .page-header { background: var(--card-bg); padding: 24px; border-radius: 16px; margin-bottom: 24px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); }
         .page-title { color: white; font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .page-subtitle { color: rgba(255,255,255,0.8); font-size: 1rem; }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
-        .dashboard-card { background: var(--card-bg); padding: 28px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; }
+        .dashboard-card { background: var(--card-bg); padding: 28px; border-radius: 16px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; }
         .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
         .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .card-title { color: white; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
@@ -47,7 +47,7 @@
         .card-value { font-size: 2.2rem; font-weight: 700; color: var(--warning-color); margin-bottom: 8px; }
         .card-subtitle { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
         .card-trend { font-size: 0.85rem; font-weight: 600; padding: 4px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .kpi-container { background: var(--card-bg); padding: 28px; border-radius: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.2); }
+        .kpi-container { background: var(--card-bg); padding: 28px; border-radius: 16px; margin-bottom: 24px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); }
         .kpi-header { color: white; font-size: 1.8rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
         .kpi-card { background: var(--card-bg-solid); padding: 24px; border-radius: 16px; text-align: center; border: 1px solid rgba(0,0,0,0.1); transition: all 0.3s ease; }
@@ -58,7 +58,7 @@
         .progress-bar { width: 100%; height: 10px; background: #e5e7eb; border-radius: 6px; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
         .progress-text { font-size: 0.8rem; font-weight: 600; color: #374151; margin-top: 8px; }
-        .inventory-container { background: var(--card-bg); padding: 24px; border-radius: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.2); }
+        .inventory-container { background: var(--card-bg); padding: 24px; border-radius: 16px; margin-bottom: 24px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); }
         .inventory-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .inventory-title { color: white; font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
         .connection-status { display: flex; align-items: center; gap: 8px; }
@@ -154,17 +154,17 @@
 <body>
 <div class="app-container">
     <nav class="sidebar" id="sidebar">
-        <button class="toggle-btn" onclick="toggleSidebar()">â¹</button>
+        <button class="toggle-btn" onclick="toggleSidebar()">‹</button>
         <div class="sidebar-header">
-            <h1 class="sidebar-title">â <span class="title-text">Watch OS</span></h1>
+            <h1 class="sidebar-title">⌚ <span class="title-text">Watch OS</span></h1>
         </div>
         <div class="sidebar-menu">
-            <button class="menu-item active" onclick="showPage('dashboard', this)">ð <span class="menu-text">ããã·ã¥ãã¼ã</span></button>
-            <button class="menu-item" onclick="showPage('inventory', this)">ð¦ <span class="menu-text">å¨åº«ç®¡ç</span></button>
-            <button class="menu-item" onclick="showPage('kpi', this)">ð <span class="menu-text">æéKPI</span></button>
-            <button class="menu-item" onclick="showPage('analytics', this)">ð <span class="menu-text">åæã¬ãã¼ã</span></button>
-            <button class="menu-item" onclick="showPage('notes', this)">ð <span class="menu-text">ã¡ã¢</span></button>
-            <button class="menu-item" onclick="showPage('settings', this)">âï¸ <span class="menu-text">è¨­å®</span></button>
+            <button class="menu-item active" onclick="showPage('dashboard', this)">📊 <span class="menu-text">ダッシュボード</span></button>
+            <button class="menu-item" onclick="showPage('inventory', this)">📦 <span class="menu-text">在庫管理</span></button>
+            <button class="menu-item" onclick="showPage('kpi', this)">📈 <span class="menu-text">月間KPI</span></button>
+            <button class="menu-item" onclick="showPage('analytics', this)">📊 <span class="menu-text">分析レポート</span></button>
+            <button class="menu-item" onclick="showPage('settings', this)">⚙️ <span class="menu-text">設定</span></button>
+            <button class="menu-item" onclick="showPage('notes', this)">📝 <span class="menu-text">メモ</span></button>
         </div>
     </nav>
 
@@ -172,16 +172,16 @@
         <!-- DASHBOARD -->
         <div id="dashboard" class="page active">
             <div class="page-header">
-                <h1 class="page-title">ð ããã·ã¥ãã¼ã</h1>
-                <p class="page-subtitle">å£²ä¸ã»å¨åº«ã»å©çã®æ¦è¦ãç¢ºèª</p>
+                <h1 class="page-title">📊 ダッシュボード</h1>
+                <p class="page-subtitle">売上・在庫・利益の概要を確認</p>
             </div>
             <div class="dashboard-grid">
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð¦</div>ç·å¨åº«æ°</div></div><div class="card-value" id="total-inventory">0</div><div class="card-subtitle">ç»é²æ¸ã¿ååæ°</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð°</div>ä»æå£²ä¸</div><div class="card-trend" id="sales-trend">+0%</div></div><div class="card-value" id="monthly-sales">Â¥0</div><div class="card-subtitle">ä»æã®ç·å£²ä¸éé¡</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð</div>ä»æå©ç</div><div class="card-trend" id="profit-trend">+0%</div></div><div class="card-value" id="monthly-profit">Â¥0</div><div class="card-subtitle">ææ°æã»ã³ã¹ãå·®ãå¼ãå¾</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">â°</div>å¹³åè²©å£²æ¥æ°</div></div><div class="card-value" id="avg-days">0æ¥</div><div class="card-subtitle">åºåããå£²å´ã¾ã§ã®å¹³å</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð</div>è²©å£²æåç</div></div><div class="card-value" id="success-rate">0%</div><div class="card-subtitle">åºåååã®å£²å´ç</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð</div>äººæ°ãã©ã³ã</div></div><div class="card-value" id="top-brand">-</div><div class="card-subtitle">æãå£²ãã¦ãããã©ã³ã</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">📦</div>総在庫数</div></div><div class="card-value" id="total-inventory">0</div><div class="card-subtitle">登録済み商品数</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">💰</div>今月売上</div><div class="card-trend" id="sales-trend">+0%</div></div><div class="card-value" id="monthly-sales">¥0</div><div class="card-subtitle">今月の総売上金額</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">📊</div>今月利益</div><div class="card-trend" id="profit-trend">+0%</div></div><div class="card-value" id="monthly-profit">¥0</div><div class="card-subtitle">手数料・コスト差し引き後</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">⏰</div>平均販売日数</div></div><div class="card-value" id="avg-days">0日</div><div class="card-subtitle">出品から売却までの平均</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">📈</div>販売成功率</div></div><div class="card-value" id="success-rate">0%</div><div class="card-subtitle">出品商品の売却率</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">💎</div>人気ブランド</div></div><div class="card-value" id="top-brand">-</div><div class="card-subtitle">最も売れているブランド</div></div>
             </div>
         </div>
 
@@ -190,44 +190,44 @@
             <div class="inventory-container">
                 <div class="inventory-header">
                     <div class="inventory-title">
-                        ð¦ å¨åº«ç®¡ç
+                        📦 在庫管理
                         <div class="connection-status" id="connection-status">
                             <div class="status-indicator" id="status-dot"></div>
-                            <span id="status-text">æ¥ç¶ä¸­...</span>
+                            <span id="status-text">接続中...</span>
                         </div>
                     </div>
-                    <button class="add-button" onclick="addNewRow()">â æ°è¦è¿½å </button>
+                    <button class="add-button" onclick="addNewRow()">➕ 新規追加</button>
                 </div>
                 <div class="search-container">
-                    <span class="search-icon">ð</span>
-                    <input type="text" class="search-input" placeholder="ãã©ã³ããã¢ãã«ãã¹ãã¼ã¿ã¹ã§æ¤ç´¢..." onkeyup="filterTable(this.value)">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="ブランド、モデル、ステータスで検索..." onkeyup="filterTable(this.value)">
                 </div>
                 <div class="table-container">
                     <div class="table-wrapper">
                         <table id="inventory-table">
                             <thead>
                                 <tr>
-                                    <th class="sortable-header watch-id-header" onclick="sortTable('watch_id')">ç®¡ççªå· <span class="sort-indicator" id="sort-watch_id"></span></th>
-                                    <th class="sortable-header brand-header" onclick="sortTable('brand')">ãã©ã³ã <span class="sort-indicator" id="sort-brand"></span></th>
-                                    <th class="sortable-header model-header" onclick="sortTable('model')">ã¢ãã« <span class="sort-indicator" id="sort-model"></span></th>
-                                    <th class="sortable-header condition-header" onclick="sortTable('condition')">ç¶æ <span class="sort-indicator" id="sort-condition"></span></th>
-                                    <th class="url-header">ã¡ã«ã«ãªURL</th>
-                                    <th class="sortable-header date-header" onclick="sortTable('listing_date')">åºåæ¥ <span class="sort-indicator" id="sort-listing_date"></span></th>
-                                    <th class="sortable-header price-header" onclick="sortTable('purchase_price')">ä»å¥ä¾¡æ ¼ <span class="sort-indicator" id="sort-purchase_price"></span></th>
-                                    <th class="sortable-header shipping-header" onclick="sortTable('shipping_cost')">éæ <span class="sort-indicator" id="sort-shipping_cost"></span></th>
-                                    <th class="sortable-header cost-header" onclick="sortTable('other_cost')">ä»ã³ã¹ã <span class="sort-indicator" id="sort-other_cost"></span></th>
-                                    <th class="sortable-header destination-header" onclick="sortTable('destination')">è²©å£²å <span class="sort-indicator" id="sort-destination"></span></th>
-                                    <th class="sortable-header status-header" onclick="sortTable('status')">ã¹ãã¼ã¿ã¹ <span class="sort-indicator" id="sort-status"></span></th>
-                                    <th class="url-header">è²©å£²åURL</th>
-                                    <th class="sortable-header date-header" onclick="sortTable('sold_date')">è²©å£²æ¥ <span class="sort-indicator" id="sort-sold_date"></span></th>
-                                    <th class="sortable-header price-header" onclick="sortTable('selling_price')">å£²å¤ <span class="sort-indicator" id="sort-selling_price"></span></th>
-                                    <th class="sortable-header days-header" onclick="sortTable('days_to_sell')">â°æ¥æ° <span class="sort-indicator" id="sort-days_to_sell"></span></th>
-                                    <th class="sortable-header profit-header" onclick="sortTable('profit')">ð°å©ç <span class="sort-indicator" id="sort-profit"></span></th>
-                                    <th class="actions-header">æä½</th>
+                                    <th class="sortable-header watch-id-header" onclick="sortTable('watch_id')">管理番号 <span class="sort-indicator" id="sort-watch_id"></span></th>
+                                    <th class="sortable-header brand-header" onclick="sortTable('brand')">ブランド <span class="sort-indicator" id="sort-brand"></span></th>
+                                    <th class="sortable-header model-header" onclick="sortTable('model')">モデル <span class="sort-indicator" id="sort-model"></span></th>
+                                    <th class="sortable-header condition-header" onclick="sortTable('condition')">状態 <span class="sort-indicator" id="sort-condition"></span></th>
+                                    <th class="url-header">メルカリURL</th>
+                                    <th class="sortable-header date-header" onclick="sortTable('listing_date')">出品日 <span class="sort-indicator" id="sort-listing_date"></span></th>
+                                    <th class="sortable-header price-header" onclick="sortTable('purchase_price')">仕入価格 <span class="sort-indicator" id="sort-purchase_price"></span></th>
+                                    <th class="sortable-header shipping-header" onclick="sortTable('shipping_cost')">送料 <span class="sort-indicator" id="sort-shipping_cost"></span></th>
+                                    <th class="sortable-header cost-header" onclick="sortTable('other_cost')">他コスト <span class="sort-indicator" id="sort-other_cost"></span></th>
+                                    <th class="sortable-header destination-header" onclick="sortTable('destination')">販売先 <span class="sort-indicator" id="sort-destination"></span></th>
+                                    <th class="sortable-header status-header" onclick="sortTable('status')">ステータス <span class="sort-indicator" id="sort-status"></span></th>
+                                    <th class="url-header">販売先URL</th>
+                                    <th class="sortable-header date-header" onclick="sortTable('sold_date')">販売日 <span class="sort-indicator" id="sort-sold_date"></span></th>
+                                    <th class="sortable-header price-header" onclick="sortTable('selling_price')">売値 <span class="sort-indicator" id="sort-selling_price"></span></th>
+                                    <th class="sortable-header days-header" onclick="sortTable('days_to_sell')">⏰日数 <span class="sort-indicator" id="sort-days_to_sell"></span></th>
+                                    <th class="sortable-header profit-header" onclick="sortTable('profit')">💰利益 <span class="sort-indicator" id="sort-profit"></span></th>
+                                    <th class="actions-header">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body">
-                                <tr><td colspan="17" class="loading"><span class="loading-spinner"></span>ãã¼ã¿ãèª­ã¿è¾¼ã¿ä¸­...</td></tr>
+                                <tr><td colspan="17" class="loading"><span class="loading-spinner"></span>データを読み込み中...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -238,32 +238,32 @@
         <!-- KPI -->
         <div id="kpi" class="page">
             <div class="page-header">
-                <h1 class="page-title">ð æéKPI</h1>
-                <p class="page-subtitle">ç®æ¨éæç¶æ³ãç¢ºèª</p>
+                <h1 class="page-title">📈 月間KPI</h1>
+                <p class="page-subtitle">目標達成状況を確認</p>
             </div>
             <div class="kpi-container">
-                <div class="kpi-header">ð æéKPI - <span id="current-month"></span></div>
+                <div class="kpi-header">📈 月間KPI - <span id="current-month"></span></div>
                 <div class="kpi-grid">
                     <div class="kpi-card">
-                        <div class="kpi-title">ð¯ å£²ä¸ç®æ¨</div>
-                        <div class="kpi-value" style="color: #3b6fd4;" id="sales-kpi-value">Â¥0</div>
-                        <div class="kpi-target" id="sales-kpi-target">ç®æ¨: Â¥0</div>
+                        <div class="kpi-title">🎯 売上目標</div>
+                        <div class="kpi-value" style="color: #3b6fd4;" id="sales-kpi-value">¥0</div>
+                        <div class="kpi-target" id="sales-kpi-target">目標: ¥0</div>
                         <div class="progress-bar"><div class="progress-fill" style="background: #3b6fd4; width: 0%;" id="sales-progress"></div></div>
-                        <div class="progress-text" id="sales-progress-text">0% éæ</div>
+                        <div class="progress-text" id="sales-progress-text">0% 達成</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-title">ð° å©çç®æ¨</div>
-                        <div class="kpi-value" style="color: #10b981;" id="profit-kpi-value">Â¥0</div>
-                        <div class="kpi-target" id="profit-kpi-target">ç®æ¨: Â¥0</div>
+                        <div class="kpi-title">💰 利益目標</div>
+                        <div class="kpi-value" style="color: #10b981;" id="profit-kpi-value">¥0</div>
+                        <div class="kpi-target" id="profit-kpi-target">目標: ¥0</div>
                         <div class="progress-bar"><div class="progress-fill" style="background: #10b981; width: 0%;" id="profit-progress"></div></div>
-                        <div class="progress-text" id="profit-progress-text">0% éæ</div>
+                        <div class="progress-text" id="profit-progress-text">0% 達成</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-title">ð¦ è²©å£²æ°ç®æ¨</div>
+                        <div class="kpi-title">📦 販売数目標</div>
                         <div class="kpi-value" style="color: #f59e0b;" id="quantity-kpi-value">0</div>
-                        <div class="kpi-target" id="quantity-kpi-target">ç®æ¨: 0å</div>
+                        <div class="kpi-target" id="quantity-kpi-target">目標: 0個</div>
                         <div class="progress-bar"><div class="progress-fill" style="background: #f59e0b; width: 0%;" id="quantity-progress"></div></div>
-                        <div class="progress-text" id="quantity-progress-text">0% éæ</div>
+                        <div class="progress-text" id="quantity-progress-text">0% 達成</div>
                     </div>
                 </div>
             </div>
@@ -272,102 +272,102 @@
         <!-- ANALYTICS -->
         <div id="analytics" class="page">
             <div class="page-header">
-                <h1 class="page-title">ð åæã¬ãã¼ã</h1>
-                <p class="page-subtitle">å£²ä¸ãã¬ã³ãã¨ååããã©ã¼ãã³ã¹ã®è©³ç´°åæ</p>
+                <h1 class="page-title">📊 分析レポート</h1>
+                <p class="page-subtitle">売上トレンドと商品パフォーマンスの詳細分析</p>
             </div>
             <div class="dashboard-grid">
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð</div>ãã¹ãã»ã©ã¼åå</div></div><div class="card-value" id="best-seller">-</div><div class="card-subtitle">æé«å©çåå</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð</div>å¹³åå©çç</div></div><div class="card-value" id="profit-margin">0%</div><div class="card-subtitle">å£²å¤ã«å¯¾ããå©çã®å²å</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð</div>æéè²©å£²</div></div><div class="card-value" id="fastest-sale">0æ¥</div><div class="card-subtitle">æç­è²©å£²æé</div></div>
-                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">ð¯</div>å¨åº«åè»¢ç</div></div><div class="card-value" id="inventory-turnover">0å</div><div class="card-subtitle">æéå¨åº«åè»¢åæ°</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">🏆</div>ベストセラー商品</div></div><div class="card-value" id="best-seller">-</div><div class="card-subtitle">最高利益商品</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">📈</div>平均利益率</div></div><div class="card-value" id="profit-margin">0%</div><div class="card-subtitle">売値に対する利益の割合</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">🚀</div>最速販売</div></div><div class="card-value" id="fastest-sale">0日</div><div class="card-subtitle">最短販売期間</div></div>
+                <div class="dashboard-card"><div class="card-header"><div class="card-title"><div class="card-icon">🎯</div>在庫回転率</div></div><div class="card-value" id="inventory-turnover">0回</div><div class="card-subtitle">月間在庫回転回数</div></div>
             </div>
         </div>
 
         <!-- SETTINGS -->
         <div id="settings" class="page">
             <div class="page-header">
-                <h1 class="page-title">âï¸ ã·ã¹ãã è¨­å®</h1>
-                <p class="page-subtitle">KPIç®æ¨ã»ææ°æã»ãã©ã³ãã»ç®¡ççªå·ç®¡ç</p>
+                <h1 class="page-title">⚙️ システム設定</h1>
+                <p class="page-subtitle">KPI目標・手数料・ブランド・管理番号管理</p>
             </div>
             <div class="settings-container">
                 <div class="settings-section">
-                    <div class="settings-subtitle">ð¢ ç®¡ççªå·è¨­å®</div>
+                    <div class="settings-subtitle">🔢 管理番号設定</div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">ç®¡ççªå·ãã¬ãã£ãã¯ã¹</label>
-                            <input type="text" id="watch-id-prefix" class="form-input" placeholder="ä¾: WT, WB, WATCH" value="WT">
+                            <label class="form-label">管理番号プレフィックス</label>
+                            <input type="text" id="watch-id-prefix" class="form-input" placeholder="例: WT, WB, WATCH" value="WT">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">æ¬¡ã®çªå·ï¼ç¾å¨ã®æå¤§å¤+1ï¼</label>
-                            <input type="number" id="watch-id-next" class="form-input" placeholder="ä¾: 1" value="1" min="1">
+                            <label class="form-label">次の番号（現在の最大値+1）</label>
+                            <input type="number" id="watch-id-next" class="form-input" placeholder="例: 1" value="1" min="1">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">æ¡æ°</label>
+                            <label class="form-label">桁数</label>
                             <select id="watch-id-digits" class="form-input">
-                                <option value="3">3æ¡ (ä¾: WT001)</option>
-                                <option value="4" selected>4æ¡ (ä¾: WT0001)</option>
-                                <option value="5">5æ¡ (ä¾: WT00001)</option>
+                                <option value="3">3桁 (例: WT001)</option>
+                                <option value="4" selected>4桁 (例: WT0001)</option>
+                                <option value="5">5桁 (例: WT00001)</option>
                             </select>
                         </div>
                     </div>
                     <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; margin-top: 8px;">
-                        <span style="font-weight: 600; color: #374151;">ãã¬ãã¥ã¼: </span>
+                        <span style="font-weight: 600; color: #374151;">プレビュー: </span>
                         <span id="watch-id-preview" style="color: var(--primary-color); font-weight: 700; font-size: 1.1rem;">WT0001</span>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-subtitle">ð¯ æéKPIç®æ¨è¨­å®</div>
+                    <div class="settings-subtitle">🎯 月間KPI目標設定</div>
                     <div class="form-grid">
-                        <div class="form-group"><label class="form-label">å£²ä¸ç®æ¨ï¼åï¼</label><input type="number" id="sales-goal" class="form-input" value="500000"></div>
-                        <div class="form-group"><label class="form-label">å©çç®æ¨ï¼åï¼</label><input type="number" id="profit-goal" class="form-input" value="150000"></div>
-                        <div class="form-group"><label class="form-label">è²©å£²æ°ç®æ¨ï¼åï¼</label><input type="number" id="quantity-goal" class="form-input" value="20"></div>
+                        <div class="form-group"><label class="form-label">売上目標（円）</label><input type="number" id="sales-goal" class="form-input" value="500000"></div>
+                        <div class="form-group"><label class="form-label">利益目標（円）</label><input type="number" id="profit-goal" class="form-input" value="150000"></div>
+                        <div class="form-group"><label class="form-label">販売数目標（個）</label><input type="number" id="quantity-goal" class="form-input" value="20"></div>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-subtitle">ð³ ãã©ãããã©ã¼ã ææ°æè¨­å®ï¼%ï¼</div>
+                    <div class="settings-subtitle">💳 プラットフォーム手数料設定（%）</div>
                     <div class="form-grid">
-                        <div class="form-group"><label class="form-label">ã¡ã«ã«ãªææ°æ</label><input type="number" id="mercari-fee" class="form-input" value="10.0" step="0.1"></div>
-                        <div class="form-group"><label class="form-label">ã¤ããªã¯ææ°æ</label><input type="number" id="yahoo-fee" class="form-input" value="8.8" step="0.1"></div>
-                        <div class="form-group"><label class="form-label">PayPayããªãææ°æ</label><input type="number" id="paypay-fee" class="form-input" value="5.0" step="0.1"></div>
-                        <div class="form-group"><label class="form-label">eBayææ°æ</label><input type="number" id="ebay-fee" class="form-input" value="13.25" step="0.1"></div>
+                        <div class="form-group"><label class="form-label">メルカリ手数料</label><input type="number" id="mercari-fee" class="form-input" value="10.0" step="0.1"></div>
+                        <div class="form-group"><label class="form-label">ヤフオク手数料</label><input type="number" id="yahoo-fee" class="form-input" value="8.8" step="0.1"></div>
+                        <div class="form-group"><label class="form-label">PayPayフリマ手数料</label><input type="number" id="paypay-fee" class="form-input" value="5.0" step="0.1"></div>
+                        <div class="form-group"><label class="form-label">eBay手数料</label><input type="number" id="ebay-fee" class="form-input" value="13.25" step="0.1"></div>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-subtitle">ð·ï¸ ãã©ã³ãç®¡ç</div>
+                    <div class="settings-subtitle">🏷️ ブランド管理</div>
                     <div class="brands-container" id="brands-container"></div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="text" id="new-brand" class="form-input" placeholder="æ°ãããã©ã³ãåãå¥å" style="max-width: 250px;">
-                        <button class="button-primary" onclick="addBrand()">ãã©ã³ãè¿½å </button>
+                        <input type="text" id="new-brand" class="form-input" placeholder="新しいブランド名を入力" style="max-width: 250px;">
+                        <button class="button-primary" onclick="addBrand()">ブランド追加</button>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-subtitle">ð eBayé£æºè¨­å®</div>
+                    <div class="settings-subtitle">🌐 eBay連携設定</div>
                     <div class="form-grid">
                         <div class="form-group"><label class="form-label">eBay APP ID</label><input type="text" id="ebay-app-id" class="form-input" value="ShotaMak-WatchRes-PRD-b4ec29b67-7e96f3b5"></div>
-                        <div class="form-group"><label class="form-label">ééãã­ãã¡ã¤ã«ID</label><input type="text" id="shipping-profile-id" class="form-input" value="255340181018"></div>
-                        <div class="form-group"><label class="form-label">è¿åããªã·ã¼ID</label><input type="text" id="return-profile-id" class="form-input" value="255340211018"></div>
-                        <div class="form-group"><label class="form-label">æ¯æããã­ãã¡ã¤ã«ID</label><input type="text" id="payment-profile-id" class="form-input" value="276123165018"></div>
+                        <div class="form-group"><label class="form-label">配送プロファイルID</label><input type="text" id="shipping-profile-id" class="form-input" value="255340181018"></div>
+                        <div class="form-group"><label class="form-label">返品ポリシーID</label><input type="text" id="return-profile-id" class="form-input" value="255340211018"></div>
+                        <div class="form-group"><label class="form-label">支払いプロファイルID</label><input type="text" id="payment-profile-id" class="form-input" value="276123165018"></div>
                     </div>
                 </div>
 
-                <button class="button-primary" onclick="saveSettings()">ð¾ è¨­å®ãä¿å­</button>
+                <button class="button-primary" onclick="saveSettings()">💾 設定を保存</button>
             </div>
         </div>
 
         <!-- NOTES -->
         <div id="notes" class="page">
             <div class="page-header">
-                <h1 class="page-title">ð ã¡ã¢</h1>
-                <p class="page-subtitle">èªç±ã«ã¡ã¢ãè¨é²ã»ç®¡ç</p>
+                <h1 class="page-title">📝 メモ</h1>
+                <p class="page-subtitle">自由にメモを記録・管理</p>
             </div>
             <div class="notes-container">
-                <textarea id="notes-content" class="notes-textarea" placeholder="ããã«èªç±ã«ã¡ã¢ãè¨å¥ãã¦ãã ãã..."></textarea>
+                <textarea id="notes-content" class="notes-textarea" placeholder="ここに自由にメモを記入してください..."></textarea>
                 <br><br>
-                <button class="button-primary" onclick="saveNotes()">ð¾ ã¡ã¢ãä¿å­</button>
+                <button class="button-primary" onclick="saveNotes()">💾 メモを保存</button>
             </div>
         </div>
     </main>
@@ -376,13 +376,13 @@
 <!-- eBay Modal -->
 <div id="ebay-modal" class="modal" style="display: none;">
     <div class="modal-content">
-        <h3 class="modal-title">ð eBayèªååºå</h3>
-        <div class="modal-form-group"><label class="modal-label">ã¿ã¤ãã«ï¼è±èªï¼</label><input type="text" id="ebay-title" class="modal-input" placeholder="ä¾: Vintage SEIKO Automatic Watch From Japan"></div>
-        <div class="modal-form-group"><label class="modal-label">ååèª¬ææï¼è±èªï¼</label><textarea id="ebay-description" class="modal-textarea"></textarea></div>
-        <div class="modal-form-group"><label class="modal-label">è²©å£²ä¾¡æ ¼ï¼USDï¼</label><input type="number" id="ebay-price" class="modal-input" style="max-width: 150px;" step="0.01"></div>
+        <h3 class="modal-title">🛒 eBay自動出品</h3>
+        <div class="modal-form-group"><label class="modal-label">タイトル（英語）</label><input type="text" id="ebay-title" class="modal-input" placeholder="例: Vintage SEIKO Automatic Watch From Japan"></div>
+        <div class="modal-form-group"><label class="modal-label">商品説明文（英語）</label><textarea id="ebay-description" class="modal-textarea"></textarea></div>
+        <div class="modal-form-group"><label class="modal-label">販売価格（USD）</label><input type="number" id="ebay-price" class="modal-input" style="max-width: 150px;" step="0.01"></div>
         <div class="modal-buttons">
-            <button class="button-secondary" onclick="closeEbayModal()">ã­ã£ã³ã»ã«</button>
-            <button class="button-primary" onclick="submitEbayListing()">ð eBayã«åºå</button>
+            <button class="button-secondary" onclick="closeEbayModal()">キャンセル</button>
+            <button class="button-primary" onclick="submitEbayListing()">🚀 eBayに出品</button>
         </div>
     </div>
 </div>
@@ -397,15 +397,15 @@
     let isOnline = false;
 
     const shippingOptions = {
-        'ã¡ã«ã«ãª': [{ name: 'ãã³ãã¹', cost: 210 }, { name: 'å®æ¥ä¾¿ã³ã³ãã¯ã', cost: 450 }, { name: 'å®æ¥ä¾¿60', cost: 750 }],
-        'ã¤ããªã¯': [{ name: 'ãã¦ããéé', cost: 200 }, { name: 'ã¤ããã³ããã¯', cost: 450 }, { name: 'ããããã¯', cost: 800 }, { name: 'å®å½¢å¤', cost: 300 }, { name: 'ã¬ã¿ã¼ããã¯', cost: 520 }],
-        'PayPayããªã': [{ name: 'ãã¦ããéé', cost: 200 }, { name: 'ãã³ãã¹', cost: 210 }, { name: 'ããããã¯', cost: 800 }],
+        'メルカリ': [{ name: 'ネコポス', cost: 210 }, { name: '宅急便コンパクト', cost: 450 }, { name: '宅急便60', cost: 750 }],
+        'ヤフオク': [{ name: 'おてがる配送', cost: 200 }, { name: 'ヤフネコパック', cost: 450 }, { name: 'ゆうパック', cost: 800 }, { name: '定形外', cost: 300 }, { name: 'レターパック', cost: 520 }],
+        'PayPayフリマ': [{ name: 'おてがる配送', cost: 200 }, { name: 'ネコポス', cost: 210 }, { name: 'ゆうパック', cost: 800 }],
         'eBay': [{ name: 'Standard Shipping', cost: 3000 }, { name: 'Expedited Shipping', cost: 3000 }, { name: 'Express Shipping', cost: 3000 }]
     };
 
-    let platformFees = { 'ã¡ã«ã«ãª': 10.0, 'ã¤ããªã¯': 8.8, 'PayPayããªã': 5.0, 'eBay': 13.25 };
+    let platformFees = { 'メルカリ': 10.0, 'ヤフオク': 8.8, 'PayPayフリマ': 5.0, 'eBay': 13.25 };
 
-    // ãã¼ã¸èª­ã¿è¾¼ã¿æã«ç¾å¨ã®ãã¼ã¸ãå¾©å
+    // ページ読み込み時に現在のページを復元
     document.addEventListener('DOMContentLoaded', function() {
         loadSettings();
         loadInventory();
@@ -414,7 +414,7 @@
         renderBrands();
         setupWatchIdPreview();
 
-        // URLããã·ã¥ãããã¼ã¸ãå¾©åï¼ãªã­ã¼ãå¯¾ç­ï¼
+        // URLハッシュからページを復元（リロード対策）
         const hash = window.location.hash.replace('#', '') || 'dashboard';
         const validPages = ['dashboard', 'inventory', 'kpi', 'analytics', 'settings', 'notes'];
         const targetPage = validPages.includes(hash) ? hash : 'dashboard';
@@ -431,13 +431,13 @@
         document.addEventListener('keydown', handleKeyboardShortcuts);
     });
 
-    // URLããã·ã¥ã§ãã¼ã¸ç¶æãä¿æï¼ãªã­ã¼ãå¯¾ç­ï¼
+    // URLハッシュでページ状態を保持（リロード対策）
     function showPage(pageId, btn) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         if (btn) btn.classList.add('active');
-        window.location.hash = pageId; // URLããã·ã¥ãæ´æ°
+        window.location.hash = pageId; // URLハッシュを更新
 
         if (pageId === 'dashboard') updateDashboard();
         else if (pageId === 'inventory') renderTable();
@@ -453,7 +453,7 @@
         localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
     }
 
-    // ç®¡ççªå·ãã¬ãã¥ã¼
+    // 管理番号プレビュー
     function setupWatchIdPreview() {
         ['watch-id-prefix', 'watch-id-next', 'watch-id-digits'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateWatchIdPreview);
@@ -483,7 +483,7 @@
         return `${prefix}${String(maxNumber + 1).padStart(digits, '0')}`;
     }
 
-    // APIéä¿¡
+    // API通信
     async function loadInventory() {
         updateConnectionStatus('connecting');
         try {
@@ -497,9 +497,9 @@
             updateDashboard();
             updateKPI();
         } catch (err) {
-            console.error('APIæ¥ç¶å¤±æ:', err);
+            console.error('API接続失敗:', err);
             updateConnectionStatus('offline');
-            // ã­ã¼ã«ã«ã¹ãã¬ã¼ã¸ãããã©ã¼ã«ããã¯
+            // ローカルストレージからフォールバック
             const local = localStorage.getItem('watchOS_inventory_backup');
             if (local) {
                 inventory = JSON.parse(local).inventory || [];
@@ -512,12 +512,12 @@
     function updateConnectionStatus(status) {
         const dot = document.getElementById('status-dot');
         const text = document.getElementById('status-text');
-        if (status === 'online') { dot.className = 'status-indicator'; text.textContent = 'ãªã³ã©ã¤ã³'; isOnline = true; }
-        else if (status === 'offline') { dot.className = 'status-indicator offline'; text.textContent = 'ãªãã©ã¤ã³'; isOnline = false; }
-        else { dot.className = 'status-indicator'; text.textContent = 'æ¥ç¶ä¸­...'; }
+        if (status === 'online') { dot.className = 'status-indicator'; text.textContent = 'オンライン'; isOnline = true; }
+        else if (status === 'offline') { dot.className = 'status-indicator offline'; text.textContent = 'オフライン'; isOnline = false; }
+        else { dot.className = 'status-indicator'; text.textContent = '接続中...'; }
     }
 
-    // ããã·ã¥ãã¼ãæ´æ°
+    // ダッシュボード更新
     function updateDashboard() {
         const now = new Date();
         const cm = now.getMonth() + 1, cy = now.getFullYear();
@@ -526,15 +526,15 @@
         const profit = sold.reduce((s,i) => s+(i.profit||0), 0);
         const soldWithDays = sold.filter(i => i.days_to_sell);
         const avgDays = soldWithDays.length > 0 ? Math.round(soldWithDays.reduce((s,i) => s+i.days_to_sell, 0)/soldWithDays.length) : 0;
-        const listed = inventory.filter(i => i.status==='åºåä¸­'||i.status==='å£²å´æ¸ã¿');
+        const listed = inventory.filter(i => i.status==='出品中'||i.status==='売却済み');
         const successRate = listed.length > 0 ? Math.round((sold.length/listed.length)*100) : 0;
         const brandCounts = {};
         sold.forEach(i => { if(i.brand) brandCounts[i.brand]=(brandCounts[i.brand]||0)+1; });
         const topBrand = Object.keys(brandCounts).sort((a,b)=>brandCounts[b]-brandCounts[a])[0]||'-';
         document.getElementById('total-inventory').textContent = inventory.length;
-        document.getElementById('monthly-sales').textContent = `Â¥${sales.toLocaleString()}`;
-        document.getElementById('monthly-profit').textContent = `Â¥${profit.toLocaleString()}`;
-        document.getElementById('avg-days').textContent = `${avgDays}æ¥`;
+        document.getElementById('monthly-sales').textContent = `¥${sales.toLocaleString()}`;
+        document.getElementById('monthly-profit').textContent = `¥${profit.toLocaleString()}`;
+        document.getElementById('avg-days').textContent = `${avgDays}日`;
         document.getElementById('success-rate').textContent = `${successRate}%`;
         document.getElementById('top-brand').textContent = topBrand;
     }
@@ -549,38 +549,38 @@
         const actualQty = sold.length;
         const sg = settings.salesGoal||500000, pg = settings.profitGoal||150000, qg = settings.quantityGoal||20;
         const sp = Math.min((actualSales/sg)*100,100), pp = Math.min((actualProfit/pg)*100,100), qp = Math.min((actualQty/qg)*100,100);
-        document.getElementById('sales-kpi-value').textContent = `Â¥${actualSales.toLocaleString()}`;
-        document.getElementById('sales-kpi-target').textContent = `ç®æ¨: Â¥${sg.toLocaleString()}`;
+        document.getElementById('sales-kpi-value').textContent = `¥${actualSales.toLocaleString()}`;
+        document.getElementById('sales-kpi-target').textContent = `目標: ¥${sg.toLocaleString()}`;
         document.getElementById('sales-progress').style.width = `${sp}%`;
-        document.getElementById('sales-progress-text').textContent = `${Math.round(sp)}% éæ`;
-        document.getElementById('profit-kpi-value').textContent = `Â¥${actualProfit.toLocaleString()}`;
-        document.getElementById('profit-kpi-target').textContent = `ç®æ¨: Â¥${pg.toLocaleString()}`;
+        document.getElementById('sales-progress-text').textContent = `${Math.round(sp)}% 達成`;
+        document.getElementById('profit-kpi-value').textContent = `¥${actualProfit.toLocaleString()}`;
+        document.getElementById('profit-kpi-target').textContent = `目標: ¥${pg.toLocaleString()}`;
         document.getElementById('profit-progress').style.width = `${pp}%`;
-        document.getElementById('profit-progress-text').textContent = `${Math.round(pp)}% éæ`;
+        document.getElementById('profit-progress-text').textContent = `${Math.round(pp)}% 達成`;
         document.getElementById('quantity-kpi-value').textContent = actualQty;
-        document.getElementById('quantity-kpi-target').textContent = `ç®æ¨: ${qg}å`;
+        document.getElementById('quantity-kpi-target').textContent = `目標: ${qg}個`;
         document.getElementById('quantity-progress').style.width = `${qp}%`;
-        document.getElementById('quantity-progress-text').textContent = `${Math.round(qp)}% éæ`;
+        document.getElementById('quantity-progress-text').textContent = `${Math.round(qp)}% 達成`;
     }
 
     function updateCurrentMonth() {
         const now = new Date();
-        const months = ['1æ','2æ','3æ','4æ','5æ','6æ','7æ','8æ','9æ','10æ','11æ','12æ'];
-        document.getElementById('current-month').textContent = `${now.getFullYear()}å¹´${months[now.getMonth()]}`;
+        const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+        document.getElementById('current-month').textContent = `${now.getFullYear()}年${months[now.getMonth()]}`;
     }
 
     function updateAnalytics() {
-        const sold = inventory.filter(i=>i.status==='å£²å´æ¸ã¿');
-        if (!sold.length) { document.getElementById('best-seller').textContent='-'; document.getElementById('profit-margin').textContent='0%'; document.getElementById('fastest-sale').textContent='0æ¥'; document.getElementById('inventory-turnover').textContent='0å'; return; }
+        const sold = inventory.filter(i=>i.status==='売却済み');
+        if (!sold.length) { document.getElementById('best-seller').textContent='-'; document.getElementById('profit-margin').textContent='0%'; document.getElementById('fastest-sale').textContent='0日'; document.getElementById('inventory-turnover').textContent='0回'; return; }
         const best = sold.reduce((b,i)=>(i.profit||0)>(b.profit||0)?i:b);
         document.getElementById('best-seller').textContent = `${best.brand||''} ${best.model||''}`.trim()||'-';
         const avgMargin = sold.reduce((s,i)=>s+(i.selling_price>0?(i.profit/i.selling_price)*100:0),0)/sold.length;
         document.getElementById('profit-margin').textContent = `${Math.round(avgMargin)}%`;
         const fastest = Math.min(...sold.map(i=>i.days_to_sell||Infinity));
-        document.getElementById('fastest-sale').textContent = fastest===Infinity?'0æ¥':`${fastest}æ¥`;
+        document.getElementById('fastest-sale').textContent = fastest===Infinity?'0日':`${fastest}日`;
         const now=new Date(); const cm=now.getMonth()+1,cy=now.getFullYear();
         const ms=sold.filter(i=>{const d=new Date(i.sold_date);return d.getMonth()+1===cm&&d.getFullYear()===cy;});
-        document.getElementById('inventory-turnover').textContent = `${Math.round(ms.length/(inventory.length||1)*12*10)/10}å`;
+        document.getElementById('inventory-turnover').textContent = `${Math.round(ms.length/(inventory.length||1)*12*10)/10}回`;
     }
 
     function getSettings() {
@@ -595,9 +595,9 @@
             watchIdPrefix: document.getElementById('watch-id-prefix').value||'WT',
             watchIdDigits: parseInt(document.getElementById('watch-id-digits').value)||4,
             platformFees: {
-                'ã¡ã«ã«ãª': parseFloat(document.getElementById('mercari-fee').value)||10.0,
-                'ã¤ããªã¯': parseFloat(document.getElementById('yahoo-fee').value)||8.8,
-                'PayPayããªã': parseFloat(document.getElementById('paypay-fee').value)||5.0,
+                'メルカリ': parseFloat(document.getElementById('mercari-fee').value)||10.0,
+                'ヤフオク': parseFloat(document.getElementById('yahoo-fee').value)||8.8,
+                'PayPayフリマ': parseFloat(document.getElementById('paypay-fee').value)||5.0,
                 'eBay': parseFloat(document.getElementById('ebay-fee').value)||13.25
             },
             brands: brands,
@@ -612,7 +612,7 @@
         platformFees = settings.platformFees;
         inventory.forEach(i => { i.profit = calculateProfit(i.selling_price, i.purchase_price, i.shipping_cost, i.other_cost, i.destination); });
         renderTable(); updateDashboard(); updateKPI();
-        showMessage('è¨­å®ãä¿å­ãã¾ããï¼', 'success');
+        showMessage('設定を保存しました！', 'success');
     }
 
     function loadSettings() {
@@ -622,7 +622,7 @@
         document.getElementById('quantity-goal').value = s.quantityGoal||20;
         document.getElementById('watch-id-prefix').value = s.watchIdPrefix||'WT';
         document.getElementById('watch-id-digits').value = s.watchIdDigits||4;
-        if (s.platformFees) { platformFees=s.platformFees; document.getElementById('mercari-fee').value=s.platformFees['ã¡ã«ã«ãª']||10; document.getElementById('yahoo-fee').value=s.platformFees['ã¤ããªã¯']||8.8; document.getElementById('paypay-fee').value=s.platformFees['PayPayããªã']||5; document.getElementById('ebay-fee').value=s.platformFees['eBay']||13.25; }
+        if (s.platformFees) { platformFees=s.platformFees; document.getElementById('mercari-fee').value=s.platformFees['メルカリ']||10; document.getElementById('yahoo-fee').value=s.platformFees['ヤフオク']||8.8; document.getElementById('paypay-fee').value=s.platformFees['PayPayフリマ']||5; document.getElementById('ebay-fee').value=s.platformFees['eBay']||13.25; }
         if (s.brands) brands=s.brands;
         if (s.ebaySettings) { document.getElementById('ebay-app-id').value=s.ebaySettings.appId||''; document.getElementById('shipping-profile-id').value=s.ebaySettings.shippingProfileId||''; document.getElementById('return-profile-id').value=s.ebaySettings.returnProfileId||''; document.getElementById('payment-profile-id').value=s.ebaySettings.paymentProfileId||''; }
         if (localStorage.getItem('sidebar-collapsed')==='true') { document.getElementById('sidebar').classList.add('collapsed'); document.getElementById('main-content').classList.add('expanded'); }
@@ -631,34 +631,34 @@
     function renderBrands() {
         const c = document.getElementById('brands-container');
         c.innerHTML = '';
-        brands.forEach(b => { const t=document.createElement('div'); t.className='brand-tag'; t.innerHTML=`${b} <button class="brand-remove" onclick="removeBrand('${b}')">Ã</button>`; c.appendChild(t); });
+        brands.forEach(b => { const t=document.createElement('div'); t.className='brand-tag'; t.innerHTML=`${b} <button class="brand-remove" onclick="removeBrand('${b}')">×</button>`; c.appendChild(t); });
     }
 
     function addBrand() {
         const input = document.getElementById('new-brand');
         const brand = input.value.trim().toUpperCase();
-        if (brand && !brands.includes(brand)) { brands.push(brand); renderBrands(); input.value=''; showMessage(`ã${brand}ããè¿½å ãã¾ãã`,'success'); }
-        else if (brands.includes(brand)) showMessage(`ã${brand}ãã¯æ¢ã«ç»é²æ¸ã¿ã§ã`,'error');
+        if (brand && !brands.includes(brand)) { brands.push(brand); renderBrands(); input.value=''; showMessage(`「${brand}」を追加しました`,'success'); }
+        else if (brands.includes(brand)) showMessage(`「${brand}」は既に登録済みです`,'error');
     }
 
     function removeBrand(brand) {
-        if (confirm(`ã${brand}ããåé¤ãã¾ããï¼`)) { brands=brands.filter(b=>b!==brand); renderBrands(); }
+        if (confirm(`「${brand}」を削除しますか？`)) { brands=brands.filter(b=>b!==brand); renderBrands(); }
     }
 
-    function saveNotes() { localStorage.setItem('watchOS_notes', document.getElementById('notes-content').value); showMessage('ã¡ã¢ãä¿å­ãã¾ãã','success'); }
+    function saveNotes() { localStorage.setItem('watchOS_notes', document.getElementById('notes-content').value); showMessage('メモを保存しました','success'); }
     function loadNotes() { const s=localStorage.getItem('watchOS_notes'); if(s) document.getElementById('notes-content').value=s; }
 
     function renderTable() {
         const tbody = document.getElementById('table-body');
         tbody.innerHTML = '';
-        if (!inventory.length) { tbody.innerHTML='<tr><td colspan="17" style="text-align:center;padding:60px;color:#6b7280;">ð¦ å¨åº«ãã¼ã¿ãããã¾ãã</td></tr>'; return; }
+        if (!inventory.length) { tbody.innerHTML='<tr><td colspan="17" style="text-align:center;padding:60px;color:#6b7280;">📦 在庫データがありません</td></tr>'; return; }
         inventory.forEach((item,i) => tbody.appendChild(createTableRow(item,i)));
     }
 
     function createTableRow(item, index) {
         const row = document.createElement('tr');
-        if (item.status==='å£²å´æ¸ã¿') row.className='status-row-sold';
-        else if (item.status==='åºåä¸­') row.className='status-row-listing';
+        if (item.status==='売却済み') row.className='status-row-sold';
+        else if (item.status==='出品中') row.className='status-row-listing';
         else row.className='status-row-unlisted';
         const isEditing = editingId===item.id;
         row.innerHTML = `
@@ -666,14 +666,14 @@
             <td>${isEditing?createBrandSelect(item.brand):(item.brand||'')}</td>
             <td>${isEditing?createInput('model',item.model,'text','95px'):(item.model||'')}</td>
             <td>${isEditing?createConditionSelect(item.condition):(item.condition||'')}</td>
-            <td>${isEditing?createInput('mercari_url',item.mercari_url,'url','85px','ã¡ã«ã«ãªURL'):createUrlLink(item.mercari_url)}</td>
+            <td>${isEditing?createInput('mercari_url',item.mercari_url,'url','85px','メルカリURL'):createUrlLink(item.mercari_url)}</td>
             <td>${isEditing?createInput('listing_date',item.listing_date,'date','100px'):(item.listing_date||'-')}</td>
             <td>${isEditing?createInput('purchase_price',item.purchase_price,'number','80px'):formatCurrency(item.purchase_price)}</td>
             <td>${isEditing?createShippingInput(item):createShippingDisplay(item)}</td>
             <td>${isEditing?createInput('other_cost',item.other_cost,'number','70px'):formatCurrency(item.other_cost)}</td>
             <td>${isEditing?createDestinationSelect(item.destination):(item.destination||'')}</td>
             <td>${isEditing?createStatusSelect(item.status):createStatusBadge(item.status)}</td>
-            <td>${isEditing?createInput('sales_url',item.sales_url,'url','85px','è²©å£²åURL'):createUrlLink(item.sales_url)}</td>
+            <td>${isEditing?createInput('sales_url',item.sales_url,'url','85px','販売先URL'):createUrlLink(item.sales_url)}</td>
             <td>${isEditing?createInput('sold_date',item.sold_date,'date','100px'):(item.sold_date||'-')}</td>
             <td>${isEditing?createInput('selling_price',item.selling_price,'number','80px'):formatCurrency(item.selling_price)}</td>
             <td class="days-cell">${createDaysDisplay(item.days_to_sell)}</td>
@@ -682,23 +682,23 @@
         return row;
     }
 
-    function createBrandSelect(v) { const opts=brands.map(b=>`<option value="${b}" ${b===v?'selected':''}>${b}</option>`).join(''); return `<select class="select-field" style="width:75px;" onchange="updateEditData('brand',this.value)"><option value="">é¸æ</option>${opts}</select>`; }
-    function createConditionSelect(v) { return `<select class="select-field" style="width:70px;" onchange="updateEditData('condition',this.value)">${['æ°å','ç¨¼åå','é»æ± äº¤æ','ã¸ã£ã³ã¯'].map(c=>`<option value="${c}" ${c===v?'selected':''}>${c}</option>`).join('')}</select>`; }
-    function createDestinationSelect(v) { return `<select class="select-field" style="width:70px;" onchange="updateEditData('destination',this.value)">${['ã¡ã«ã«ãª','ã¤ããªã¯','PayPayããªã','eBay'].map(d=>`<option value="${d}" ${d===v?'selected':''}>${d}</option>`).join('')}</select>`; }
-    function createStatusSelect(v) { return `<select class="select-field" style="width:80px;" onchange="updateEditData('status',this.value)">${['æªåºå','åºåä¸­','å£²å´æ¸ã¿'].map(s=>`<option value="${s}" ${s===v?'selected':''}>${s}</option>`).join('')}</select>`; }
+    function createBrandSelect(v) { const opts=brands.map(b=>`<option value="${b}" ${b===v?'selected':''}>${b}</option>`).join(''); return `<select class="select-field" style="width:75px;" onchange="updateEditData('brand',this.value)"><option value="">選択</option>${opts}</select>`; }
+    function createConditionSelect(v) { return `<select class="select-field" style="width:70px;" onchange="updateEditData('condition',this.value)">${['新品','稼働品','電池交換','ジャンク'].map(c=>`<option value="${c}" ${c===v?'selected':''}>${c}</option>`).join('')}</select>`; }
+    function createDestinationSelect(v) { return `<select class="select-field" style="width:70px;" onchange="updateEditData('destination',this.value)">${['メルカリ','ヤフオク','PayPayフリマ','eBay'].map(d=>`<option value="${d}" ${d===v?'selected':''}>${d}</option>`).join('')}</select>`; }
+    function createStatusSelect(v) { return `<select class="select-field" style="width:80px;" onchange="updateEditData('status',this.value)">${['未出品','出品中','売却済み'].map(s=>`<option value="${s}" ${s===v?'selected':''}>${s}</option>`).join('')}</select>`; }
     function createInput(f,v,t,w,p='') { return `<input type="${t}" class="input-field" style="width:${w};" value="${v||''}" placeholder="${p}" onchange="updateEditData('${f}',this.value)">`; }
     function createShippingInput(item) {
         const opts=(shippingOptions[item.destination]||[]).map(o=>`<option value="${o.name}" ${o.name===item.shipping_method?'selected':''}>${o.name}</option>`).join('');
-        return `<div class="shipping-input-group"><input type="number" class="input-field shipping-cost-input" value="${item.shipping_cost||0}" onchange="updateEditData('shipping_cost',this.value)"><select class="select-field shipping-method-select" onchange="updateShippingMethod(this.value,'${item.destination}')"><option value="">æ¹æ³</option>${opts}</select></div>`;
+        return `<div class="shipping-input-group"><input type="number" class="input-field shipping-cost-input" value="${item.shipping_cost||0}" onchange="updateEditData('shipping_cost',this.value)"><select class="select-field shipping-method-select" onchange="updateShippingMethod(this.value,'${item.destination}')"><option value="">方法</option>${opts}</select></div>`;
     }
     function createShippingDisplay(item) { return `<div><div style="font-weight:600;">${formatCurrency(item.shipping_cost)}</div><div style="font-size:0.7rem;color:#6b7280;">${item.shipping_method||''}</div></div>`; }
-    function createStatusBadge(s) { const c=s==='å£²å´æ¸ã¿'?'status-sold':s==='åºåä¸­'?'status-listing':'status-unlisted'; return `<span class="status-badge ${c}">${s||'æªè¨­å®'}</span>`; }
-    function createUrlLink(url) { return url?`<a href="${url}" target="_blank" class="url-link">ð</a>`:'-'; }
-    function createDaysDisplay(d) { if(!d) return `<div class="days-display" style="color:#9ca3af;">â° -</div>`; const c=d<=7?'#10b981':d<=30?'#f59e0b':'#ef4444'; return `<div class="days-display" style="color:${c};">â° ${d}</div>`; }
-    function createProfitDisplay(p) { if(p===undefined||p===null) return `<div class="profit-display" style="color:#9ca3af;">ð° -</div>`; const c=p>0?'#10b981':p<0?'#ef4444':'#6b7280'; return `<div class="profit-display" style="color:${c};">ð° ${p.toLocaleString()}</div>`; }
+    function createStatusBadge(s) { const c=s==='売却済み'?'status-sold':s==='出品中'?'status-listing':'status-unlisted'; return `<span class="status-badge ${c}">${s||'未設定'}</span>`; }
+    function createUrlLink(url) { return url?`<a href="${url}" target="_blank" class="url-link">🔗</a>`:'-'; }
+    function createDaysDisplay(d) { if(!d) return `<div class="days-display" style="color:#9ca3af;">⏰ -</div>`; const c=d<=7?'#10b981':d<=30?'#f59e0b':'#ef4444'; return `<div class="days-display" style="color:${c};">⏰ ${d}</div>`; }
+    function createProfitDisplay(p) { if(p===undefined||p===null) return `<div class="profit-display" style="color:#9ca3af;">💰 -</div>`; const c=p>0?'#10b981':p<0?'#ef4444':'#6b7280'; return `<div class="profit-display" style="color:${c};">💰 ${p.toLocaleString()}</div>`; }
     function createActionButtons(item, isEditing) {
-        if (isEditing) return `<div class="action-buttons"><div class="action-row"><button class="action-button save-button" onclick="saveEdit(${item.id})">ð¾</button><button class="action-button cancel-button" onclick="cancelEdit()">â</button></div><button class="action-button ebay-button" onclick="openEbayModal(${item.id})">eBay</button></div>`;
-        return `<div class="action-buttons"><div class="action-row"><button class="action-button edit-button" onclick="startEdit(${item.id})">âï¸</button><button class="action-button delete-button" onclick="deleteItem(${item.id})">ðï¸</button></div><button class="action-button ebay-button" onclick="openEbayModal(${item.id})">eBay</button></div>`;
+        if (isEditing) return `<div class="action-buttons"><div class="action-row"><button class="action-button save-button" onclick="saveEdit(${item.id})">💾</button><button class="action-button cancel-button" onclick="cancelEdit()">❌</button></div><button class="action-button ebay-button" onclick="openEbayModal(${item.id})">eBay</button></div>`;
+        return `<div class="action-buttons"><div class="action-row"><button class="action-button edit-button" onclick="startEdit(${item.id})">✏️</button><button class="action-button delete-button" onclick="deleteItem(${item.id})">🗑️</button></div><button class="action-button ebay-button" onclick="openEbayModal(${item.id})">eBay</button></div>`;
     }
 
     function startEdit(id) { editingId=id; renderTable(); }
@@ -708,7 +708,7 @@
         const item = inventory.find(i=>i.id===editingId);
         if (item) {
             item[field] = field.includes('price')||field.includes('cost') ? (parseFloat(value)||0) : value;
-            if (field==='status'&&value==='å£²å´æ¸ã¿'&&!item.sold_date) item.sold_date=getTodayDate();
+            if (field==='status'&&value==='売却済み'&&!item.sold_date) item.sold_date=getTodayDate();
             item.profit = calculateProfit(item.selling_price, item.purchase_price, item.shipping_cost, item.other_cost, item.destination);
             item.days_to_sell = calculateDaysToSell(item.listing_date, item.sold_date);
         }
@@ -733,40 +733,40 @@
             if (isNew) { const idx=inventory.findIndex(i=>i.id===id); if(idx>=0) inventory[idx]=saved; }
             editingId=null;
             renderTable(); updateDashboard(); updateKPI();
-            showMessage('ä¿å­ãã¾ãã','success');
+            showMessage('保存しました','success');
         } catch(err) {
-            console.error('ä¿å­ã¨ã©ã¼:', err);
+            console.error('保存エラー:', err);
             editingId=null;
             localStorage.setItem('watchOS_inventory_backup', JSON.stringify({inventory}));
             renderTable();
-            showMessage('ãªãã©ã¤ã³ä¿å­ãã¾ãã','success');
+            showMessage('オフライン保存しました','success');
         }
     }
 
     async function deleteItem(id) {
-        if (!confirm('ãã®ååãåé¤ãã¾ããï¼')) return;
+        if (!confirm('この商品を削除しますか？')) return;
         try {
             await fetch(`${API_BASE_URL}/inventory/${id}`, {method:'DELETE'});
             inventory=inventory.filter(i=>i.id!==id);
             renderTable(); updateDashboard(); updateKPI();
-            showMessage('åé¤ãã¾ãã','success');
+            showMessage('削除しました','success');
         } catch(err) {
             inventory=inventory.filter(i=>i.id!==id);
             renderTable();
-            showMessage('åé¤ãã¾ãã','success');
+            showMessage('削除しました','success');
         }
     }
 
     function addNewRow() {
         const tempId = Date.now();
-        inventory.unshift({ id:tempId, watch_id:generateWatchId(), brand:'', model:'', condition:'ç¨¼åå', mercari_url:'', purchase_price:0, selling_price:0, destination:'ã¡ã«ã«ãª', status:'æªåºå', listing_date:getTodayDate(), sold_date:'', days_to_sell:null, profit:0, sales_url:'', shipping_cost:210, shipping_method:'ãã³ãã¹', other_cost:0 });
+        inventory.unshift({ id:tempId, watch_id:generateWatchId(), brand:'', model:'', condition:'稼働品', mercari_url:'', purchase_price:0, selling_price:0, destination:'メルカリ', status:'未出品', listing_date:getTodayDate(), sold_date:'', days_to_sell:null, profit:0, sales_url:'', shipping_cost:210, shipping_method:'ネコポス', other_cost:0 });
         editingId=tempId;
         renderTable();
     }
 
     function getTodayDate() { return new Date().toISOString().split('T')[0]; }
-    function formatCurrency(a) { return `Â¥${(a||0).toLocaleString()}`; }
-    function calculateProfit(sp,pp,sc=0,oc=0,dest='ã¡ã«ã«ãª') { const p=sp||0,pu=pp||0,s=sc||0,o=oc||0; const fee=Math.round(p*((platformFees[dest]||10)/100)); return p-pu-s-o-fee; }
+    function formatCurrency(a) { return `¥${(a||0).toLocaleString()}`; }
+    function calculateProfit(sp,pp,sc=0,oc=0,dest='メルカリ') { const p=sp||0,pu=pp||0,s=sc||0,o=oc||0; const fee=Math.round(p*((platformFees[dest]||10)/100)); return p-pu-s-o-fee; }
     function calculateDaysToSell(l,s) { if(!l||!s) return null; return Math.ceil(Math.abs(new Date(s)-new Date(l))/(1000*60*60*24)); }
 
     function filterTable(term) {
@@ -779,7 +779,7 @@
         const dir = sortConfig.key===key&&sortConfig.direction==='asc'?'desc':'asc';
         sortConfig={key,direction:dir};
         document.querySelectorAll('.sort-indicator').forEach(e=>e.textContent='');
-        document.getElementById(`sort-${key}`).textContent=dir==='asc'?'â':'â';
+        document.getElementById(`sort-${key}`).textContent=dir==='asc'?'↑':'↓';
         inventory.sort((a,b)=>{
             let av=a[key],bv=b[key];
             if (key==='watch_id') { av=parseInt((av||'').replace(/\D/g,''))||0; bv=parseInt((bv||'').replace(/\D/g,''))||0; }
@@ -809,13 +809,13 @@
         const title=document.getElementById('ebay-title').value.trim();
         const desc=document.getElementById('ebay-description').value.trim();
         const price=parseFloat(document.getElementById('ebay-price').value);
-        if (!title||!desc||!price) { showMessage('ãã¹ã¦ã®é ç®ãå¥åãã¦ãã ãã','error'); return; }
+        if (!title||!desc||!price) { showMessage('すべての項目を入力してください','error'); return; }
         try {
             const res=await fetch(`${API_BASE_URL}/ebay-auto-list`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description:desc,price_usd:price,brand:currentEbayItem.brand||'Unbranded'})});
             const data=await res.json();
-            if(data.success) { currentEbayItem.sales_url=`https://ebay.com/itm/${data.item_id}`; renderTable(); closeEbayModal(); showMessage('eBayã«åºåããã¾ããï¼','success'); }
-            else showMessage('eBayåºåå¤±æ: '+data.error,'error');
-        } catch(err) { showMessage('eBayåºåã«å¤±æãã¾ãã','error'); }
+            if(data.success) { currentEbayItem.sales_url=`https://ebay.com/itm/${data.item_id}`; renderTable(); closeEbayModal(); showMessage('eBayに出品されました！','success'); }
+            else showMessage('eBay出品失敗: '+data.error,'error');
+        } catch(err) { showMessage('eBay出品に失敗しました','error'); }
     }
 
     function handleKeyboardShortcuts(e) {
